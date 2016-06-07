@@ -1,0 +1,12 @@
+---
+slack:
+  botid: xoxb-xxx
+  channels:
+    - general
+    - random
+
+mqtt:
+  topic: firehose
+  clientid: slack-firehose
+  broker: tcp://localhost:1883
+  qos: 0
