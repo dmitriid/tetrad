@@ -9,15 +9,16 @@ import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 class PostHandler implements SlackMessagePostedListener {
 
   private MQEventCallback callback;
+  private String identifier;
 
-  PostHandler(MQEventCallback callback){
+  PostHandler(MQEventCallback callback, String identifier){
     super();
     this.callback = callback;
+    this.identifier = identifier;
   }
 
   @Override
   public void onEvent(SlackMessagePosted event, SlackSession session) {
-
     System.out.println(event.getMessageContent());
     System.out.println(event.getSender().getUserName());
     System.out.println(event.getSender().getRealName());
@@ -28,7 +29,7 @@ class PostHandler implements SlackMessagePostedListener {
         "slack",
         "post",
         event.getSender().getUserName(),
-        "dmitriid",
+        identifier,
         event.getChannel().getName(),
         event.getMessageContent()
     ));

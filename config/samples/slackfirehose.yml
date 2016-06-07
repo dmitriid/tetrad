@@ -1,6 +1,7 @@
 ---
 slack:
   botid: xoxb-xxx
+  identifier: id
   channels:
     - general
     - random

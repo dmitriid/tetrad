@@ -26,6 +26,7 @@ import static java.lang.System.exit;
 public class FirehoseService implements ManagedService {
   private List<String> slackChannels = new ArrayList<>();
   private String slackBotId;
+  private String identifier;
 
   private SlackSession slackSession;
   private MqttClient mqttSession;
@@ -48,6 +49,7 @@ public class FirehoseService implements ManagedService {
     }
     //this.slackTopic = ((ArrayNode)configuration.getConfiguration().at("/slack/channels")).asL
     this.slackBotId = configuration.getConfiguration().at("/slack/botid").asText();
+    this.identifier = configuration.getConfiguration().at("/slack/identifier").asText();
 
     this.mqttBroker = configuration.getConfiguration().at("/mqtt/broker").asText();
     this.mqttClientID = configuration.getConfiguration().at("/mqtt/clientid").asText();
@@ -60,7 +62,7 @@ public class FirehoseService implements ManagedService {
 
     try {
       mqttSession = new MqttClient(mqttBroker, mqttClientID, new MemoryPersistence());
-      slackSession.addMessagePostedListener(new PostHandler(this::firehose));
+      slackSession.addMessagePostedListener(new PostHandler(this::firehose, identifier));
       slackSession.connect();
       while(slackSession.isConnected()){}
     }catch (IOException | MqttException e) {
