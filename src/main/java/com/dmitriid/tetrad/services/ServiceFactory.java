@@ -12,10 +12,7 @@ public class ServiceFactory {
 
     try {
       intArgsConstructor = Class.forName("com.dmitriid.tetrad.services." + className).getConstructor(intArgsClass);
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      System.exit(1);
-    } catch (ClassNotFoundException e) {
+    } catch (NoSuchMethodException | ClassNotFoundException e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -31,13 +28,7 @@ public class ServiceFactory {
       object = constructor.newInstance(arguments);
       System.out.println("Object: " + object.toString());
       return object;
-    } catch (InstantiationException e) {
-      System.out.println(e);
-      System.exit(1);
-    } catch (IllegalAccessException e) {
-      System.out.println(e);
-      System.exit(1);
-    } catch (IllegalArgumentException e) {
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
       System.out.println(e);
       System.exit(1);
     } catch (InvocationTargetException e) {

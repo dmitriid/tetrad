@@ -1,15 +1,16 @@
-package com.dmitriid.tetrad.services;
+package com.dmitriid.tetrad.services.slack;
 
 import com.dmitriid.tetrad.interfaces.MQEventCallback;
+import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
-public class SlackEventHandler implements SlackMessagePostedListener {
+class PostHandler implements SlackMessagePostedListener {
 
-  MQEventCallback callback;
+  private MQEventCallback callback;
 
-  public SlackEventHandler(MQEventCallback callback){
+  PostHandler(MQEventCallback callback){
     super();
     this.callback = callback;
   }

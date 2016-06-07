@@ -1,8 +1,5 @@
 package com.dmitriid.tetrad.services;
 
-/**
- * Created by dmitriid on 05/06/16.
- */
 public class ServiceException extends Exception {
   public static ServiceException StartException(String reason){
     return new ServiceException(reason, new Throwable("Error on startup"));

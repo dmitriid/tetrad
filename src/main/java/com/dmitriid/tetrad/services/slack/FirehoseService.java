@@ -1,24 +1,29 @@
-package com.dmitriid.tetrad.services;
+package com.dmitriid.tetrad.services.slack;
 
 import com.dmitriid.tetrad.interfaces.ManagedService;
+import com.dmitriid.tetrad.services.FirehoseMessage;
+import com.dmitriid.tetrad.services.ServiceConfiguration;
+import com.dmitriid.tetrad.services.ServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.events.SlackConnected;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.ullink.slack.simpleslackapi.listeners.SlackConnectedListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.System.exit;
 
-public class SlackFirehoseService implements ManagedService {
+public class FirehoseService implements ManagedService {
   private List<String> slackChannels = new ArrayList<>();
   private String slackBotId;
 
@@ -30,7 +35,7 @@ public class SlackFirehoseService implements ManagedService {
   private String mqttTopic;
   private Integer mqttQoS;
 
-  public SlackFirehoseService(){
+  public FirehoseService(){
   }
 
 
@@ -55,11 +60,9 @@ public class SlackFirehoseService implements ManagedService {
 
     try {
       mqttSession = new MqttClient(mqttBroker, mqttClientID, new MemoryPersistence());
-      slackSession.addMessagePostedListener(new SlackEventHandler(this::firehose));
+      slackSession.addMessagePostedListener(new PostHandler(this::firehose));
       slackSession.connect();
-      //for(String channel : slackChannels){
-      //  slackSession.joinChannel(channel);
-      //}
+      while(slackSession.isConnected()){}
     }catch (IOException | MqttException e) {
       e.printStackTrace();
       throw ServiceException.RunException(e.getMessage());
