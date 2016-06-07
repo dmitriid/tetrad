@@ -1,0 +1,16 @@
+# Configuration for slack: dmitriid
+---
+xmpp:
+  service_domain: jabber.ru
+  chat_service: conference.jabber.ru
+  username: u
+  password: p
+  resource: firehose
+  rooms:
+    - "some-room"
+
+mqtt:
+  topic: firehose
+  clientid: xmpp-firehose
+  broker: tcp://localhost:1883
+  qos: 0
