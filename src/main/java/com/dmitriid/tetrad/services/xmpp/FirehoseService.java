@@ -184,7 +184,7 @@ public class FirehoseService implements ManagedService {
   private void handleMessage(Message message, String room){
 
     FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
-                                                          "post",
+                                                          message.getType().name(),
                                                           message.getFrom(),
                                                           chat_service,
                                                           room,
