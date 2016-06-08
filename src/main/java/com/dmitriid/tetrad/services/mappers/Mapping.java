@@ -12,24 +12,16 @@ class Mapping {
     private Map<String, Match>        map     = new HashMap<>();
     private Map<String, List<String>> ignores = new HashMap<>();
 
-
-    private List<String> ignore;
-
-    private String xmppService;
-    private String xmppRoom;
-    private String slackService;
-    private String slackRoom;
-
-    Mapping(JsonNode mapping){
+    Mapping(JsonNode mapping, String from, String to){
         for (final JsonNode config : mapping) {
-            String service = config.at("/xmpp/room").asText() + "@" + config.at("/xmpp/service").asText();
+            String service = config.at("/" + from + "/room").asText() + "@" + config.at("/" + from +"/service").asText();
             map.put(service,
-                    new Match(config.at("/slack/service").asText(), config.at("/slack/room").asText())
+                    new Match(config.at("/" + to + "/service").asText(), config.at("/" + to + "/room").asText())
                    );
 
             ArrayList<String> ignrs = new ArrayList<>();
 
-            for(final JsonNode i : config.at("/xmpp/ignores")){
+            for(final JsonNode i : config.at("/" + from + "/ignores")){
                 ignrs.add(i.asText());
             }
 
@@ -39,6 +31,23 @@ class Mapping {
 
 
     Match match(FirehoseMessage message){
-        return map.getOrDefault(message.channel, null);
+        Match match = map.getOrDefault(message.channel, null);
+        if(match == null) {
+            String service = message.channel + "@" + message.service;
+            match = map.getOrDefault(service, null);
+            if(match == null) {
+                return null;
+            } else if(ignores.containsKey(service)){
+                if (ignores.get(service).contains(message.user)) {
+                    return null;
+                }
+            }
+        } else if(ignores.containsKey(message.channel)){
+            if(ignores.get(message.channel).contains(message.user)){
+                return null;
+            }
+        }
+
+        return match;
     }
 }

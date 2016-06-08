@@ -4,14 +4,13 @@ import com.dmitriid.tetrad.interfaces.ManagedService;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 import com.dmitriid.tetrad.services.ServiceException;
-import com.dmitriid.tetrad.services.utils.JIDUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.IOException;
 
-public class XMPPtoSlack implements ManagedService, MqttCallback {
+public class SlackToXMPP implements ManagedService, MqttCallback {
 
     private MqttAsyncClient mqttSession;
 
@@ -26,7 +25,7 @@ public class XMPPtoSlack implements ManagedService, MqttCallback {
 
     @Override
     public void init(ServiceConfiguration configuration) throws ServiceException {
-        this.mapping = new Mapping(configuration.getConfiguration().at("/mapping"), "xmpp", "slack");
+        this.mapping = new Mapping(configuration.getConfiguration().at("/mapping"), "slack", "xmpp");
 
         this.mqttBrokerSub = configuration.getConfiguration().at("/mqtt/subscribe/broker").asText();
         this.mqttClientIDSub = configuration.getConfiguration().at("/mqtt/subscribe/clientid").asText();
@@ -41,7 +40,7 @@ public class XMPPtoSlack implements ManagedService, MqttCallback {
         this.connectMQTT();
     }
 
-    private void mapToSlack(MqttMessage message){
+    private void mapToXMPP(MqttMessage message){
         try {
             final String msg = new String(message.getPayload());
 
@@ -53,7 +52,7 @@ public class XMPPtoSlack implements ManagedService, MqttCallback {
 
             final FirehoseMessage out = new FirehoseMessage(firehoseMessage.type,
                                                             firehoseMessage.subtype,
-                                                            JIDUtils.jid_to_slack_username(firehoseMessage.user),
+                                                            firehoseMessage.user + "@" + firehoseMessage.service,
                                                             match.getService(),
                                                             match.getRoom(),
                                                             firehoseMessage.content
@@ -85,7 +84,7 @@ public class XMPPtoSlack implements ManagedService, MqttCallback {
             connOpts.setCleanSession(true);
             System.out.println("Connecting to mqttBrokerSub: " + mqttBrokerSub);
 
-            XMPPtoSlack t = this;
+            SlackToXMPP t = this;
 
             mqttSession.connect(connOpts, new IMqttActionListener() {
                 @Override
@@ -118,7 +117,7 @@ public class XMPPtoSlack implements ManagedService, MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println(topic);
-        mapToSlack(message);
+        mapToXMPP(message);
     }
 
     @Override

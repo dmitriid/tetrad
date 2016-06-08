@@ -6,6 +6,8 @@ xmpp:
   username: u
   password: p
   resource: firehose
+  ignore:
+    - fluor@jabber.ru
   rooms:
     - "some-room"
 

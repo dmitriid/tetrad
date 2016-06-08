@@ -17,4 +17,8 @@ public class JIDUtils {
                 .map((s) -> valueOf(s.charAt(0)))
                 .collect(joining(".", parts.get(0) + "@", ""));
     }
+
+    public static String bareJID(String jid){
+        return jid.split("/")[0];
+    }
 }

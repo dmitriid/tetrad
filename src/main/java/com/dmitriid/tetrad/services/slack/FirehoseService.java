@@ -9,25 +9,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
-import com.ullink.slack.simpleslackapi.events.SlackConnected;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
-import com.ullink.slack.simpleslackapi.listeners.SlackConnectedListener;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.System.exit;
 
-public class FirehoseService implements ManagedService {
+public class FirehoseService implements ManagedService, MqttCallback {
   private List<String> slackChannels = new ArrayList<>();
   private String slackBotId;
   private String identifier;
 
-  private SlackSession slackSession;
-  private MqttClient   mqttSession;
+  private SlackSession    slackSession;
+  private MqttAsyncClient mqttSession;
 
   private String  mqttBroker;
   private String  mqttClientID;
@@ -35,18 +35,28 @@ public class FirehoseService implements ManagedService {
   private String  mqttTopicSub;
   private Integer mqttQoS;
 
+  private Map<String, Boolean> ignores = new HashMap<>();
+
   public FirehoseService() {
   }
 
 
   public void init(ServiceConfiguration configuration) throws ServiceException {
-    //while(!)
     JsonNode channels = configuration.getConfiguration().at("/slack/channels");
 
     for (final JsonNode channel : channels) {
       slackChannels.add(channel.asText());
     }
-    //this.slackTopic = ((ArrayNode)configuration.getConfiguration().at("/slack/channels")).asL
+
+    JsonNode ignores = configuration.getConfiguration().at("/slack/ignore");
+
+    for (final JsonNode ignore : ignores) {
+      String user = ignore.at("/username").asText();
+      Boolean bot = ignore.at("/bot").asBoolean(false);
+      this.ignores.put(user, bot);
+    }
+
+
     this.slackBotId = configuration.getConfiguration().at("/slack/botid").asText();
     this.identifier = configuration.getConfiguration().at("/slack/identifier").asText();
 
@@ -61,11 +71,11 @@ public class FirehoseService implements ManagedService {
     slackSession = SlackSessionFactory.createWebSocketSlackSession(slackBotId);
 
     try {
-      mqttSession = new MqttClient(mqttBroker, mqttClientID, new MemoryPersistence());
-      slackSession.addMessagePostedListener(new PostHandler(this::firehose, identifier));
+      this.connectMQTT();
+      slackSession.addMessagePostedListener(new PostHandler(this::firehose, identifier, this.ignores));
       slackSession.connect();
       Thread.currentThread().join();
-    } catch (IOException | MqttException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       throw ServiceException.RunException(e.getMessage());
     } catch (InterruptedException e) {
@@ -98,44 +108,56 @@ public class FirehoseService implements ManagedService {
   }
 
   private void connectMQTT() {
-    MqttConnectOptions connOpts = new MqttConnectOptions();
-    connOpts.setCleanSession(true);
-    System.out.println("Connecting to mqttBroker: " + mqttBroker);
     try {
+      mqttSession = new MqttAsyncClient(mqttBroker, mqttClientID, new MemoryPersistence());
+      MqttConnectOptions connOpts = new MqttConnectOptions();
+      connOpts.setCleanSession(true);
+      System.out.println("Connecting to mqttBroker: " + mqttBroker);
 
-      mqttSession.setCallback(new MqttCallback() {
-                                @Override
-                                public void connectionLost(Throwable cause) {
+      FirehoseService t = this;
+      mqttSession.connect(connOpts, new IMqttActionListener() {
+        @Override
+        public void onSuccess(IMqttToken asyncActionToken) {
+          mqttSession.setCallback(t);
+          try {
+            mqttSession.subscribe(mqttTopicSub, mqttQoS);
+          } catch (MqttException e) {
+            e.printStackTrace();
+          }
+        }
 
-                                }
+        @Override
+        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
 
-                                @Override
-                                public void messageArrived(String topic, MqttMessage message) throws Exception {
-                                  String msg = new String(message.getPayload());
-                                  String compareMsg = "{\"type\":\"xmpp\",\"subtype\":\"groupchat\",\"user\":\"dmitriid@conference.jabber.ru/dmitriid\",\"service\":\"conference.jabber.ru\",\"channel\":\"dmitriid@conference.jabber.ru\",\"content\":\"hhh\"}";
-
-
-                                  ObjectMapper mapper = new ObjectMapper();
-                                  FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
-
-                                  if(!identifier.equals(firehoseMessage.service)) {
-                                    return;
-                                  }
-                                  SlackChannel slackChannel = slackSession.findChannelByName(firehoseMessage.channel);
-                                  slackSession.sendMessage(slackChannel, "*" + firehoseMessage.user + "*: " + firehoseMessage.content);
-                                }
-
-                                @Override
-                                public void deliveryComplete(IMqttDeliveryToken token) {
-
-                                }
-                              }
-                             );
-      mqttSession.connect(connOpts);
-      mqttSession.subscribe(mqttTopicSub, 0);
+        }
+      });
 
     } catch (MqttException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void connectionLost(Throwable cause) {
+
+  }
+
+  @Override
+  public void messageArrived(String topic, MqttMessage message) throws Exception {
+    String msg = new String(message.getPayload());
+
+    ObjectMapper mapper = new ObjectMapper();
+    FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
+
+    if (!identifier.equals(firehoseMessage.service)) {
+      return;
+    }
+    SlackChannel slackChannel = slackSession.findChannelByName(firehoseMessage.channel);
+    slackSession.sendMessage(slackChannel, "*" + firehoseMessage.user + "*: " + firehoseMessage.content);
+  }
+
+  @Override
+  public void deliveryComplete(IMqttDeliveryToken token) {
+
   }
 }

@@ -1,23 +1,20 @@
 package com.dmitriid.tetrad.services.mappers;
 
-/**
- * Created by dmitriid on 07/06/16.
- */
 class Match {
-    private String slackService = null;
-    private String slackRoom    = null;
+    private String service = null;
+    private String room    = null;
 
-    Match(String slackService, String slackRoom) {
-        this.slackService = slackService;
-        this.slackRoom = slackRoom;
+    Match(String service, String room) {
+        this.service = service;
+        this.room = room;
     }
 
-    public String getSlackService() {
-        return slackService;
+    public String getService() {
+        return service;
     }
 
-    public String getslackRoom() {
-        return slackRoom;
+    public String getRoom() {
+        return room;
     }
 
 }

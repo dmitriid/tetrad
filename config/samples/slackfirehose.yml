@@ -3,6 +3,9 @@
 slack:
   botid: xoxb-xxx
   identifier: id
+  ignore:
+    - username: fluor
+      bot: true
   channels:
     - general
     - random

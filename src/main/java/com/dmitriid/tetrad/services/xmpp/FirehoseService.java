@@ -4,24 +4,27 @@ import com.dmitriid.tetrad.interfaces.ManagedService;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 import com.dmitriid.tetrad.services.ServiceException;
+import com.dmitriid.tetrad.services.utils.JIDUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class FirehoseService implements ManagedService {
-  private List<String> rooms = new ArrayList<>();
+public class FirehoseService implements ManagedService, MqttCallback {
+  private List<String>               rooms          = new ArrayList<>();
+  private Map<String, MultiUserChat> connectedRooms = new HashMap<>();
+  private List<String>               ignores        = new ArrayList<>();
 
   private String service_domain;
   private String chat_service;
@@ -29,14 +32,15 @@ public class FirehoseService implements ManagedService {
   private String password;
   private String resource;
 
-  private String  mqttBroker;
-  private String  mqttClientID;
-  private String  mqttTopic;
+  private String mqttBroker;
+  private String mqttClientID;
+  private String mqttTopic;
+  private String mqttTopicSub;
+
   private Integer mqttQoS;
 
-  private MqttClient mqttSession;
-  private XMPPConnection xmppConnection;
-  //private List<MultiUserChat> chatRooms;
+  private MqttAsyncClient mqttSession;
+  private XMPPConnection  xmppConnection;
 
 
   public FirehoseService(){
@@ -55,34 +59,22 @@ public class FirehoseService implements ManagedService {
       rooms.add(channel.asText());
     }
 
-    this.mqttBroker = configuration.getConfiguration().at("/mqtt/broker").asText();
-    this.mqttClientID = configuration.getConfiguration().at("/mqtt/clientid").asText();
-    this.mqttQoS = configuration.getConfiguration().at("/mqtt/qos").asInt();
-    this.mqttTopic = configuration.getConfiguration().at("/mqtt/topic").asText();
+    JsonNode ignores = configuration.getConfiguration().at("/xmpp/ignore");
+
+    for (final JsonNode ignore : ignores) {
+      this.ignores.add(ignore.asText());
+    }
+
+    this.mqttBroker = configuration.getConfiguration().at("/mqtt/publish/broker").asText();
+    this.mqttClientID = configuration.getConfiguration().at("/mqtt/publish/clientid").asText();
+    this.mqttQoS = configuration.getConfiguration().at("/mqtt/publish/qos").asInt();
+    this.mqttTopic = configuration.getConfiguration().at("/mqtt/publish/topic").asText();
+    this.mqttTopicSub = configuration.getConfiguration().at("/mqtt/subscribe/topic").asText();
+
   }
 
   public void start() throws ServiceException {
-/*
-    SSLContext sslcontext = null;
     try {
-      sslcontext = SSLContexts.custom()
-              .loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true)
-              .build();
-    } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-      e.printStackTrace();
-    }
-*/
-/*
-    XmppClient xmppClient = XmppClient.create(service_domain,
-                                              TcpConnectionConfiguration.builder()
-                                                      .secure(true)
-                                                      .sslContext(sslcontext)
-                                                      .build()
-                                             );
-*/
-
-    try {
-
       xmppConnection = new XMPPConnection(service_domain);
       xmppConnection.connect();
 
@@ -94,85 +86,19 @@ public class FirehoseService implements ManagedService {
       if(!xmppConnection.isAuthenticated())
         throw ServiceException.StartException("Could not authenticate XMPP");
 
+      DiscussionHistory history = new DiscussionHistory();
+      history.setMaxStanzas(0);
+
       for(String room : rooms){
         final String roomJID = room + "@" + chat_service;
         MultiUserChat chat = new MultiUserChat(xmppConnection, roomJID);
-        chat.join(xmppConnection.getUser());
+        chat.join(xmppConnection.getUser(), password, history, SmackConfiguration.getPacketReplyTimeout());
         chat.addMessageListener(packet -> this.handleMessage((Message)packet, roomJID));
-
-
-                /*new PacketListener() {
-          @Override
-          public void processPacket(Packet packet) {
-            System.out.println(packet.getFrom());
-          }*/
-//        });
-                /*m -> {
-          this.handleMessage(m, room);
-        });*/
+        connectedRooms.put(room, chat);
       }
-
-      mqttSession = new MqttClient(mqttBroker, mqttClientID, new MemoryPersistence());
-
-/*      xmppClient.connect();
-      xmppClient.login(username, password, resource);
-      MultiUserChatManager multiUserChatManager =
-              xmppClient.getManager(MultiUserChatManager.class);
-      ChatService chatService =
-              multiUserChatManager.createChatService(Jid.of(chat_service));
-      ChatRoom chatRoom = chatService.createRoom("dmitriid");
-
-      chatRoom.addInboundMessageListener(this::handleMessage);
-
-      xmppClient.send(new Presence(Presence.Show.CHAT));
-
-
-      chatRoom.enter(username);
-      chatRoom.sendMessage("wut");*/
-
-      /*xmppClient.connect();
-      xmppClient.login("fluor", "!hesitate101", "moi");
-
-      MultiUserChatManager multiUserChatManager = xmppClient.getManager(MultiUserChatManager.class);
-      ChatService chatService = multiUserChatManager.createChatService(Jid.of("conference.jabber.ru"));
-      ChatRoom chatRoom = chatService.createRoom("dmitriid");
-
-      chatRoom.addInboundMessageListener(e -> {
-        Message message = e.getMessage();
-        System.out.println("----- chartroom incoming listener -----");
-        System.out.println(message.getBody());
-        System.out.println(message.getFrom().toString());
-
-      });
-
-      RosterManager rosterManager = xmppClient.getManager(RosterManager.class);
-      rosterManager.addRosterListener(e -> {
-        // The roster event contains information about added, updated or deleted contacts.
-        // TODO: Update your roster!
-        Collection<Contact> contacts = rosterManager.getContacts();
-        for (Contact contact : contacts) {
-          System.out.println(contact.getName());
-        }
-      });
-
-      xmppClient.addInboundMessageListener(e -> {
-        Message message = e.getMessage();
-        System.out.println("----- client incoming listener -----");
-        System.out.println(message.getBody());
-        System.out.println(message.getFrom().toString());
-      });
-
-
-      xmppClient.send(new Presence(Presence.Show.CHAT));
-
-      chatRoom.enter("fluor");
-      chatRoom.sendMessage("wut");
-      System.out.println(chatRoom.hasEntered());*/
-
-
-
+      this.connectMQTT();
       Thread.currentThread().join();
-    } catch (MqttException | InterruptedException | XMPPException e) {
+    } catch (InterruptedException | XMPPException e) {
       e.printStackTrace();
     }
 
@@ -182,6 +108,9 @@ public class FirehoseService implements ManagedService {
   }
 
   private void handleMessage(Message message, String room){
+    if(ignores.contains(JIDUtils.bareJID(message.getFrom().replace(room + "/", "")))){
+      return;
+    }
 
     FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
                                                           message.getType().name(),
@@ -204,13 +133,60 @@ public class FirehoseService implements ManagedService {
   }
 
   private void connectMQTT() {
-    MqttConnectOptions connOpts = new MqttConnectOptions();
-    connOpts.setCleanSession(true);
-    System.out.println("Connecting to mqttBroker: " + mqttBroker);
     try {
-      mqttSession.connect(connOpts);
+      mqttSession = new MqttAsyncClient(mqttBroker, mqttClientID, new MemoryPersistence());
+
+      MqttConnectOptions connOpts = new MqttConnectOptions();
+      connOpts.setCleanSession(true);
+      System.out.println("Connecting to mqttBroker: " + mqttBroker);
+      FirehoseService t = this;
+      mqttSession.connect(connOpts, new IMqttActionListener() {
+        @Override
+        public void onSuccess(IMqttToken asyncActionToken) {
+          mqttSession.setCallback(t);
+          try {
+            mqttSession.subscribe(mqttTopicSub, mqttQoS);
+          } catch (MqttException e) {
+            e.printStackTrace();
+          }
+        }
+
+        @Override
+        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+          exception.printStackTrace();
+        }
+      });
     } catch (MqttException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void connectionLost(Throwable cause) {
+    cause.printStackTrace();
+  }
+
+  @Override
+  public void messageArrived(String topic, MqttMessage message) throws Exception {
+    String msg = new String(message.getPayload());
+
+    ObjectMapper mapper = new ObjectMapper();
+    FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
+
+    if(!chat_service.equals(firehoseMessage.service)){
+      return;
+    }
+
+    if(!connectedRooms.containsKey(firehoseMessage.channel)){
+      return;
+    }
+
+    MultiUserChat chat = connectedRooms.get(firehoseMessage.channel);
+    chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+  }
+
+  @Override
+  public void deliveryComplete(IMqttDeliveryToken token) {
+    System.out.println("a");
   }
 }
