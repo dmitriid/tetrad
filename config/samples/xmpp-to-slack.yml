@@ -1,0 +1,20 @@
+# Sample configuration for mapping xmpp to slack
+---
+mapping:
+  - xmpp:
+      service: conference.jabber.ru
+      room: x
+      ignore:
+        - x@jabber.ru
+    slack:
+      service: slack_service
+      room: random
+
+mqtt:
+  subscribe:
+    topic: firehose
+    clientid: xmpp-to-slack
+    broker: tcp://localhost:1883
+    qos: 0
+  publish:
+    topic: to-slack

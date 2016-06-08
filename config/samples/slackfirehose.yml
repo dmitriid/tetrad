@@ -1,3 +1,4 @@
+# Sample configuration for Slack firehose
 ---
 slack:
   botid: xoxb-xxx
@@ -7,7 +8,10 @@ slack:
     - random
 
 mqtt:
-  topic: firehose
-  clientid: slack-firehose
-  broker: tcp://localhost:1883
-  qos: 0
+  publish:
+    topic: firehose
+    clientid: slack-firehose
+    broker: tcp://localhost:1883
+    qos: 0
+  subscribe:
+    topic: to-slack

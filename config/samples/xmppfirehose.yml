@@ -1,4 +1,4 @@
-# Configuration for slack: dmitriid
+# Configuration for xmpp firehose
 ---
 xmpp:
   service_domain: jabber.ru
