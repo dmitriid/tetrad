@@ -8,6 +8,7 @@ public class FirehoseMessage {
   public String channel; // "random", "erlang-talks", "erlanger"
   public String content;
 
+  public FirehoseMessage(){} // for Jackson
   public FirehoseMessage(
       String type,
       String subtype,
