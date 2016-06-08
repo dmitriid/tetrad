@@ -4,21 +4,24 @@ import com.dmitriid.tetrad.interfaces.ManagedService;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 import com.dmitriid.tetrad.services.ServiceException;
+import com.dmitriid.tetrad.services.utils.JIDUtils;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class XMPPtoSlack implements ManagedService {
+import java.io.IOException;
 
-    private MqttClient mqttSession;
+public class XMPPtoSlack implements ManagedService, MqttCallback {
+
+    private MqttAsyncClient mqttSession;
 
     private String  mqttBrokerSub;
     private String  mqttClientIDSub;
     private String  mqttTopicSub;
-    private Integer mqttQoSSub;
 
-    private String  mqttBrokerPub;
-    private String  mqttClientIDPub;
     private String  mqttTopicPub;
     private Integer mqttQoSPub;
 
@@ -30,61 +33,46 @@ public class XMPPtoSlack implements ManagedService {
 
         this.mqttBrokerSub = configuration.getConfiguration().at("/mqtt/subscribe/broker").asText();
         this.mqttClientIDSub = configuration.getConfiguration().at("/mqtt/subscribe/clientid").asText();
-        this.mqttQoSSub = configuration.getConfiguration().at("/mqtt/subscribe/qos").asInt();
         this.mqttTopicSub = configuration.getConfiguration().at("/mqtt/subscribe/topic").asText();
 
-        this.mqttBrokerPub = configuration.getConfiguration().at("/mqtt/publish/broker").asText();
-        this.mqttClientIDPub = configuration.getConfiguration().at("/mqtt/publish/clientid").asText();
         this.mqttQoSPub = configuration.getConfiguration().at("/mqtt/publish/qos").asInt();
         this.mqttTopicPub = configuration.getConfiguration().at("/mqtt/publish/topic").asText();
     }
 
     @Override
     public void start() throws ServiceException {
+        this.connectMQTT();
+    }
+
+    private void mapToSlack(MqttMessage message){
         try {
-            mqttSession = new MqttClient(mqttBrokerSub, mqttClientIDSub, new MemoryPersistence());
-            mqttSession.setCallback(new MqttCallback() {
-                @Override
-                public void connectionLost(Throwable cause) {
+            final String msg = new String(message.getPayload());
 
-                }
+            final ObjectMapper mapper = new ObjectMapper();
+            final FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
 
-                @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
+            final Match match = mapping.match(firehoseMessage);
+            if (match == null) return;
 
-                    String msg = new String(message.getPayload());
+            final FirehoseMessage out = new FirehoseMessage("xmpp",
+                                                            "groupchat",
+                                                            JIDUtils.jid_to_slack_username(firehoseMessage.user),
+                                                            match.getSlackService(),
+                                                            match.getslackRoom(),
+                                                            firehoseMessage.content
+            );
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
+            final byte[] content = mapper.writeValueAsBytes(out);
+            MqttMessage outMessage = new MqttMessage(content);
+            outMessage.setQos(mqttQoSPub);
 
-                    Match match = mapping.match(firehoseMessage);
-                    if(match == null) return;
-
-                    FirehoseMessage out = new FirehoseMessage("xmpp",
-                                                              "groupchat",
-                                                              "dmitriid",
-                                                              match.getSlackService(),
-                                                              match.getslackRoom(),
-                                                              firehoseMessage.content
-                                                              );
-
-                    byte[] content = mapper.writeValueAsBytes(msg);
-                    MqttMessage outMessage = new MqttMessage(content);
-                    outMessage.setQos(mqttQoSPub);
-
-                    mqttSession.publish(mqttTopicPub, outMessage);
-                }
-
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken token) {
-
-                }
-            });
-            this.connectMQTT();
-            mqttSession.subscribe(mqttTopicSub);
-        } catch (MqttException e) {
+            try {
+                mqttSession.publish(mqttTopicPub, outMessage);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-            throw ServiceException.RunException(e.getMessage());
         }
     }
 
@@ -95,14 +83,50 @@ public class XMPPtoSlack implements ManagedService {
 
     private void connectMQTT() {
         try {
+            mqttSession = new MqttAsyncClient(mqttBrokerSub, mqttClientIDSub, new MemoryPersistence());
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             System.out.println("Connecting to mqttBrokerSub: " + mqttBrokerSub);
-            mqttSession.connect(connOpts);
+
+            XMPPtoSlack t = this;
+
+            mqttSession.connect(connOpts, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    mqttSession.setCallback(t);
+                    try {
+                        mqttSession.subscribe(mqttTopicSub, mqttQoSPub);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+
+                }
+            });
+
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    public void connectionLost(Throwable cause) {
+        cause.printStackTrace();
+        System.out.println(cause.getMessage());
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        System.out.println(topic);
+        mapToSlack(message);
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+
+    }
 }
 

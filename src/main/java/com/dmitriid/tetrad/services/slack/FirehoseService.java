@@ -112,6 +112,8 @@ public class FirehoseService implements ManagedService {
                                 @Override
                                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                                   String msg = new String(message.getPayload());
+                                  String compareMsg = "{\"type\":\"xmpp\",\"subtype\":\"groupchat\",\"user\":\"dmitriid@conference.jabber.ru/dmitriid\",\"service\":\"conference.jabber.ru\",\"channel\":\"dmitriid@conference.jabber.ru\",\"content\":\"hhh\"}";
+
 
                                   ObjectMapper mapper = new ObjectMapper();
                                   FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
@@ -130,7 +132,7 @@ public class FirehoseService implements ManagedService {
                               }
                              );
       mqttSession.connect(connOpts);
-      mqttSession.subscribe(mqttTopicSub);
+      mqttSession.subscribe(mqttTopicSub, 0);
 
     } catch (MqttException e) {
       e.printStackTrace();
