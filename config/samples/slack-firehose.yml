@@ -1,0 +1,23 @@
+# Configuration for a slack firehose service: dmitriid
+---
+handler: SlackService
+
+slack:
+  - botid: xoxb-xxx
+    identifier: service-identifier
+    ignore:
+      - username: fluor
+        bot: true
+    channels:
+      - general
+      - random
+
+mqtt:
+  clientid: slack-firehose
+  broker: tcp://localhost:1883
+  firehose:
+    topic: firehose
+    qos: 0
+  subscribe:
+    topic: to-slack
+    qos: 0

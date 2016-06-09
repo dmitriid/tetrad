@@ -1,0 +1,26 @@
+# Configuration for an XMPP firehose: dmitriid
+---
+handler: XMPPService
+
+xmpp:
+  - service_domain: jabber.ru
+    chat_service: conference.jabber.ru
+    username: xxx
+    password: yyy
+    resource: firehose
+    resource_per_user: true
+    max_resources: 7
+    ignore:
+      - fluor@jabber.ru
+    rooms:
+      - xxx
+
+mqtt:
+  clientid: xmpp-firehose
+  broker: tcp://localhost:1883
+  firehose:
+    topic: firehose
+    qos: 0
+  subscribe:
+    topic: to-xmpp
+    qos: 0
