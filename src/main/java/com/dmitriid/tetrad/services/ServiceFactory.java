@@ -11,7 +11,7 @@ public class ServiceFactory {
     Constructor intArgsConstructor = null;
 
     try {
-      intArgsConstructor = Class.forName("com.dmitriid.tetrad.services." + className).getConstructor(intArgsClass);
+      intArgsConstructor = Class.forName("com.dmitriid.tetrad." + className).getConstructor(intArgsClass);
     } catch (NoSuchMethodException | ClassNotFoundException e) {
       e.printStackTrace();
       System.exit(1);

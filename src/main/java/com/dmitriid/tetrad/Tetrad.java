@@ -13,16 +13,15 @@ public class Tetrad {
 
   public static void main(String[] args) throws ServiceException {
     CommandLine line = new CommandLine(args);
+    String configFile = line.optionValue("config");
 
-    //String name = line.optionValue("n", "name");
-    //String mbox_name = line.optionValue("m", "mbox");
-    //String cookie = line.optionValue("c", "cookie");
-    String connector = line.optionValue("connector");
-    String config = line.optionValue("config");
+    ServiceConfiguration configuration = new ServiceConfiguration(configFile);
+    String handler = configuration.getConfiguration().at("/handler").asText();
 
-    new Tetrad(ServiceFactory.getService(connector), new ServiceConfiguration(config)).run();
+    ManagedService service = ServiceFactory.getService(handler);
+
+    new Tetrad(service, configuration).run();
   }
-
 
 
   private Tetrad(ManagedService service, ServiceConfiguration configuration){
@@ -34,10 +33,15 @@ public class Tetrad {
     try{
       service.init(configuration);
       service.start();
+      Thread.currentThread().join();
     } catch(Exception e){
       e.printStackTrace();
     } finally {
-      service.shutdown();
+      try {
+        service.shutdown();
+      } catch(Exception e){
+        e.printStackTrace();
+      }
     }
   }
 }
