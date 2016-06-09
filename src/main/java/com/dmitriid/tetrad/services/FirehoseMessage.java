@@ -1,6 +1,6 @@
 package com.dmitriid.tetrad.services;
 
-public class FirehoseMessage {
+public class FirehoseMessage implements Cloneable {
   public String type;  // "slack", "xmpp"
   public String subtype; // "post", "edit", "subscribe", "login"
   public String user; // "xyz", "foo@bar
@@ -25,5 +25,21 @@ public class FirehoseMessage {
     this.content = content;
   }
 
+  @Override
+  public Object clone(){
+    try {
+      return super.clone();
+    } catch (CloneNotSupportedException e) {
+      e.printStackTrace();
+      return new FirehoseMessage(
+              this.type,
+              this.subtype,
+              this.user,
+              this.service,
+              this.channel,
+              this.content
+      );
+    }
+  }
 
 }

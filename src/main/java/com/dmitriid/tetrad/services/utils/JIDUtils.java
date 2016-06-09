@@ -21,4 +21,8 @@ public class JIDUtils {
     public static String bareJID(String jid){
         return jid.split("/")[0];
     }
+
+    public static String bareUsername(String jid) {
+        return jid.split("@")[0];
+    }
 }

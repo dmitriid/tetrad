@@ -7,6 +7,7 @@ import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -21,7 +22,7 @@ public class TetradXMPP {
     private String username;
     private String password;
     private String resource;
-    private Boolean resources_per_user = false;
+    private Boolean resource_per_user = false;
     private Integer max_resources;
 
     private List<String> ignore = new ArrayList<>();
@@ -29,7 +30,10 @@ public class TetradXMPP {
     private List<String> rooms  = new ArrayList<>();
     private Map<String, MultiUserChat> connectedRooms = new HashMap<>();
 
-    private Map<String, String> perUserResources = new HashMap<>();
+    private HashMap<String/*user*/, MultiUserChat>
+            perUserRooms = new HashMap<>();
+    private HashMap<String/*user*/, XMPPConnection>
+            perUserConnections = new HashMap<>();
 
     private XMPPConnection xmppConnection;
 
@@ -41,8 +45,8 @@ public class TetradXMPP {
         username = config.at("/username").asText();
         password = config.at("/password").asText();
         resource = config.at("/resource").asText();
-        resources_per_user = config.at("/service_domain").asBoolean(false);
-        max_resources = config.at("/service_domain").asInt(5);
+        resource_per_user = config.at("/resource_per_user").asBoolean(false);
+        max_resources = config.at("/max_resources").asInt(5);
 
         for (JsonNode user : config.at("/ignore")) {
             ignore.add(user.asText());
@@ -84,7 +88,7 @@ public class TetradXMPP {
 
         FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
                                                               message.getType().name(),
-                                                              message.getFrom(),
+                                                              JIDUtils.bareJID(jid) + "@" + getChatService(),
                                                               getChatService(),
                                                               room,
                                                               message.getBody());
@@ -107,12 +111,48 @@ public class TetradXMPP {
         if (!connectedRooms.containsKey(firehoseMessage.channel)) {
             return;
         }
-
         MultiUserChat chat = connectedRooms.get(firehoseMessage.channel);
-        if(!chat.isJoined()) return;
+        if (!chat.isJoined()) return;
 
         try {
-            chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+            if(resource_per_user){
+                postAsUser(chat, firehoseMessage);
+            } else {
+                chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+            }
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void postAsUser(MultiUserChat defaultChat, FirehoseMessage firehoseMessage){
+        try{
+            XMPPConnection perUserConn = new XMPPConnection(service_domain);
+            if(!perUserConnections.containsKey(firehoseMessage.user)) {
+                if (perUserConnections.size() == max_resources) {
+                    defaultChat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+                    return;
+                } else {
+                    perUserConn.connect();
+                    perUserConn.login(username, password, JIDUtils.bareUsername(firehoseMessage.user));
+                    perUserConnections.put(firehoseMessage.user, perUserConn);
+                }
+            }
+            MultiUserChat perUserChatRoom;
+            String localUser = firehoseMessage.channel + "@" + firehoseMessage.service + "/" + firehoseMessage.user;
+            if(perUserRooms.containsKey(localUser)){
+                perUserChatRoom = perUserRooms.get(localUser);
+            } else {
+                DiscussionHistory history = new DiscussionHistory();
+                history.setMaxStanzas(0);
+
+                final String roomJID = firehoseMessage.channel + "@" + getChatService();
+                perUserChatRoom = new MultiUserChat(perUserConn, roomJID);
+                perUserChatRoom.join(perUserConn.getUser(), password);
+                perUserRooms.put(localUser, perUserChatRoom);
+            }
+
+            perUserChatRoom.sendMessage(firehoseMessage.content);
         } catch (XMPPException e) {
             e.printStackTrace();
         }
