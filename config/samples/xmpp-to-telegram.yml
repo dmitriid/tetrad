@@ -1,0 +1,27 @@
+# XMPP -> Telegram
+---
+handler: MappingService
+
+mapping:
+  - from_channel: dmitriid@conference.jabber.ru
+    from_type: xmpp
+    from_subtype: groupchat
+    to_service: "-1001050383488"
+    #to_channel: random
+    short_username: true
+  - from_channel: "erlang-talks@conference.jabber.ru"
+    from_type: xmpp
+    from_subtype: groupchat
+    to_service: "-1001066864434"
+    #to_channel: random
+    short_username: true
+
+mqtt:
+  clientid: xtm
+  broker: tcp://localhost:1883
+  subscribe:
+    topic: firehose
+    qos: 0
+  firehose:
+    topic: to-telegram
+    qos: 0

@@ -1,15 +1,22 @@
-# Configuration for a slack firehose service: dmitriid
+# Slack
 ---
 handler: SlackService
 
 slack:
   - botid: xoxb-xxx
-    identifier: service-identifier
+    identifier: dmitriid
     ignore:
       - username: fluor
         bot: true
     channels:
       - general
+      - random
+  - botid: xoxb-xxx
+    identifier: erlyclub
+    ignore:
+      - username: fluor
+        bot: true
+    channels:
       - random
 
 mqtt:

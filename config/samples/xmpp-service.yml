@@ -1,4 +1,4 @@
-# Configuration for an XMPP firehose: dmitriid
+# XMPP Service
 ---
 handler: XMPPService
 
@@ -6,14 +6,15 @@ xmpp:
   - service_domain: jabber.ru
     chat_service: conference.jabber.ru
     username: xxx
-    password: yyy
+    password: xxx
     resource: firehose
     resource_per_user: true
     max_resources: 7
     ignore:
       - fluor@jabber.ru
     rooms:
-      - xxx
+      - dmitriid
+      - "erlang-talks"
 
 mqtt:
   clientid: xmpp-firehose

@@ -1,0 +1,27 @@
+# XMPP -> Slack
+---
+handler: MappingService
+
+mapping:
+  - from_channel: dmitriid@conference.jabber.ru
+    from_type: xmpp
+    from_subtype: groupchat
+    to_service: dmitriid
+    to_channel: random
+    short_username: true
+  - from_channel: "erlang-talks@conference.jabber.ru"
+    from_type: xmpp
+    from_subtype: groupchat
+    to_service: erlyclub
+    to_channel: random
+    short_username: true
+
+mqtt:
+  clientid: xsm
+  broker: tcp://localhost:1883
+  subscribe:
+    topic: firehose
+    qos: 0
+  firehose:
+    topic: to-slack
+    qos: 0

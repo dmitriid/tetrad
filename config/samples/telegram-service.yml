@@ -1,0 +1,22 @@
+# Telegram
+---
+handler: TelegramService
+
+telegram:
+  - botid: 230919720:xxx
+    username: fluor
+    ignore:
+      - username: fluor
+        bot: true
+    channels:
+      - fluor_tests
+
+mqtt:
+  clientid: telegram-firehose
+  broker: tcp://localhost:1883
+  firehose:
+    topic: firehose
+    qos: 0
+  subscribe:
+    topic: to-telegram
+    qos: 0
