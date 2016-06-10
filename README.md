@@ -17,6 +17,8 @@ Currently only runnable through IDEA. Add the following to your app args:
 --config /path/to/your/service/config.yml
 ```
 
+Main class is `com.dmitriid.Tetrad`
+
 ## Services
 
 These will listen to all incoming messages from a service (Slack, 
