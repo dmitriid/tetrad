@@ -62,6 +62,9 @@ public class TetradMQTT implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        if(callback == null){
+            return;
+        }
         String msg = new String(message.getPayload());
 
         ObjectMapper mapper = new ObjectMapper();

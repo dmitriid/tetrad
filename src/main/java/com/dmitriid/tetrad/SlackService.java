@@ -82,6 +82,9 @@ class Slack implements SlackMessagePostedListener {
     void post(FirehoseMessage firehoseMessage){
         if(!slackSession.isConnected()) return;
         SlackChannel slackChannel = slackSession.findChannelByName(firehoseMessage.channel);
+        if(slackChannel == null){
+            return;
+        }
         slackSession.sendMessage(slackChannel, "*" + firehoseMessage.user + "*: " + firehoseMessage.content);
     }
 
