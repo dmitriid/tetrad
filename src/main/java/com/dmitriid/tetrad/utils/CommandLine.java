@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommandLine {
-  private HashMap<String, String> _options = new HashMap<String, String>();
+  private final HashMap<String, String> _options = new HashMap<>();
 
   // handle -o and --opt and -opt
 

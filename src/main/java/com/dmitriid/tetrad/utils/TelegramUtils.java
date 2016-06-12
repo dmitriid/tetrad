@@ -1,4 +1,4 @@
-package com.dmitriid.tetrad.services.utils;
+package com.dmitriid.tetrad.utils;
 
 public class TelegramUtils {
     public static String chatTitle(String fullname){

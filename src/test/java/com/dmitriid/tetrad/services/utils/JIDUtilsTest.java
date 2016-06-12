@@ -1,5 +1,6 @@
 package com.dmitriid.tetrad.services.utils;
 
+import com.dmitriid.tetrad.utils.JIDUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

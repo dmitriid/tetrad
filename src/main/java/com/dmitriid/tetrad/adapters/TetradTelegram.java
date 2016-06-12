@@ -1,32 +1,29 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.adapters;
 
+import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
-import com.dmitriid.tetrad.services.utils.JIDUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.telegram.telegrambots.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.api.methods.ParseMode;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
 public class TetradTelegram extends TelegramLongPollingBot {
-    private String botid;
-    private String username;
-    private List<String> rooms = new ArrayList<>();
-    private TetradCallback callback;
+    private final String botid;
+    private final String username;
+    private final List<String> rooms = new ArrayList<>();
+    private ITetradCallback callback;
 
     private Long startTimestamp;
 
-    TelegramBotsApi bot;
+    private TelegramBotsApi bot;
 
-    TetradTelegram(JsonNode configuration){
+    public TetradTelegram(JsonNode configuration){
         botid = configuration.at("/botid").asText();
         username = configuration.at("/username").asText();
 
@@ -35,7 +32,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
         }
     }
 
-    public void start(TetradCallback callback){
+    public void start(ITetradCallback callback){
         this.startTimestamp = System.currentTimeMillis() / 1000L;
         this.callback = callback;
         bot = new TelegramBotsApi();

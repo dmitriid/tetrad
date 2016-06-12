@@ -13,7 +13,7 @@ public class ServiceException extends Exception {
     return new ServiceException(reason, new Throwable("Error on shutdown"));
   }
 
-  public ServiceException(String message, Throwable cause) {
+  private ServiceException(String message, Throwable cause) {
     super(message, cause);
   }
 }

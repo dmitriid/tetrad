@@ -1,6 +1,8 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.services;
 
-import com.dmitriid.tetrad.interfaces.ManagedService;
+import com.dmitriid.tetrad.adapters.TetradMQTT;
+import com.dmitriid.tetrad.adapters.TetradXMPP;
+import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 import com.dmitriid.tetrad.services.ServiceException;
@@ -9,9 +11,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMPPService implements ManagedService{
-    Map<String, TetradXMPP> xmpps = new HashMap<>();
-    TetradMQTT mqtt;
+public class XMPPService implements IManagedService {
+    private final Map<String, TetradXMPP> xmpps = new HashMap<>();
+    private TetradMQTT mqtt;
 
 
     @Override

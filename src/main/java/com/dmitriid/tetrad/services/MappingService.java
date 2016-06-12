@@ -1,19 +1,17 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.services;
 
-import com.dmitriid.tetrad.interfaces.ManagedService;
-import com.dmitriid.tetrad.services.FirehoseMessage;
-import com.dmitriid.tetrad.services.ServiceConfiguration;
-import com.dmitriid.tetrad.services.ServiceException;
-import com.dmitriid.tetrad.services.utils.JIDUtils;
+import com.dmitriid.tetrad.adapters.TetradMQTT;
+import com.dmitriid.tetrad.interfaces.IManagedService;
+import com.dmitriid.tetrad.utils.JIDUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MappingService implements ManagedService {
+public class MappingService implements IManagedService {
     private List<TetradMap> mapping;
 
-    TetradMQTT mqtt;
+    private TetradMQTT mqtt;
 
 
     @Override
@@ -36,7 +34,7 @@ public class MappingService implements ManagedService {
 
     }
 
-    public void firehose(FirehoseMessage firehoseMessage){
+    private void firehose(FirehoseMessage firehoseMessage){
         mapping.stream().forEach(tetradMap -> {
             if(tetradMap.matches(firehoseMessage)){
                 mqtt.sendMessage(tetradMap.convert(firehoseMessage));
@@ -56,7 +54,7 @@ class TetradMap {
     private final String toType;
     private final String toSubtype;
 
-    private Boolean shortUserNames;
+    private final Boolean shortUserNames;
 
     TetradMap(JsonNode config){
         fromService = config.at("/from_service").asText(null);

@@ -1,13 +1,13 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.adapters;
 
+import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
-import com.dmitriid.tetrad.services.utils.JIDUtils;
+import com.dmitriid.tetrad.utils.JIDUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -17,29 +17,29 @@ import java.util.List;
 import java.util.Map;
 
 public class TetradXMPP {
-    private String service_domain;
-    private String chat_service;
-    private String username;
-    private String password;
-    private String resource;
+    private final String service_domain;
+    private       String chat_service;
+    private final String username;
+    private final String password;
+    private final String resource;
     private Boolean resource_per_user = false;
-    private Integer max_resources;
+    private final Integer max_resources;
 
-    private List<String> ignore = new ArrayList<>();
+    private final List<String> ignore = new ArrayList<>();
 
-    private List<String> rooms  = new ArrayList<>();
-    private Map<String, MultiUserChat> connectedRooms = new HashMap<>();
+    private final List<String>               rooms          = new ArrayList<>();
+    private final Map<String, MultiUserChat> connectedRooms = new HashMap<>();
 
-    private HashMap<String/*user*/, MultiUserChat>
+    private final HashMap<String/*user*/, MultiUserChat>
             perUserRooms = new HashMap<>();
-    private HashMap<String/*user*/, XMPPConnection>
+    private final HashMap<String/*user*/, XMPPConnection>
             perUserConnections = new HashMap<>();
 
     private XMPPConnection xmppConnection;
 
-    private TetradCallback callback;
+    private ITetradCallback callback;
 
-    TetradXMPP(JsonNode config){
+    public TetradXMPP(JsonNode config){
         service_domain = config.at("/service_domain").asText();
         setChatService(config.at("/chat_service").asText());
         username = config.at("/username").asText();
@@ -57,7 +57,7 @@ public class TetradXMPP {
         }
     }
 
-    public void start(TetradCallback callback){
+    public void start(ITetradCallback callback){
         this.callback = callback;
         try {
             xmppConnection = new XMPPConnection(service_domain);
@@ -95,7 +95,7 @@ public class TetradXMPP {
         callback.execute(firehoseMessage);
     }
 
-    String getChatService() {
+    public String getChatService() {
         return chat_service;
     }
 
@@ -103,7 +103,7 @@ public class TetradXMPP {
         this.chat_service = chat_service;
     }
 
-    void post(FirehoseMessage firehoseMessage){
+    public void post(FirehoseMessage firehoseMessage){
         if (!chat_service.equals(firehoseMessage.service)) {
             return;
         }

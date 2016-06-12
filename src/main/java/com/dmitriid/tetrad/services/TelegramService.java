@@ -1,19 +1,16 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.services;
 
-import com.dmitriid.tetrad.interfaces.ManagedService;
-import com.dmitriid.tetrad.services.FirehoseMessage;
-import com.dmitriid.tetrad.services.ServiceConfiguration;
-import com.dmitriid.tetrad.services.ServiceException;
+import com.dmitriid.tetrad.adapters.TetradMQTT;
+import com.dmitriid.tetrad.adapters.TetradTelegram;
+import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class TelegramService implements ManagedService {
-    Map<String, TetradTelegram> telegrams = new HashMap<>();
-    TetradMQTT mqtt;
+public class TelegramService implements IManagedService {
+    private final Map<String, TetradTelegram> telegrams = new HashMap<>();
+    private TetradMQTT mqtt;
 
     @Override
     public void init(ServiceConfiguration configuration) throws ServiceException {

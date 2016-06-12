@@ -1,8 +1,8 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.interfaces;
 
 import com.dmitriid.tetrad.services.FirehoseMessage;
 
 @FunctionalInterface
-interface TetradCallback {
+public interface ITetradCallback {
     void execute(FirehoseMessage message);
 }

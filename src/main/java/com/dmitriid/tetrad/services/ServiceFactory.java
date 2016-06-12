@@ -1,22 +1,22 @@
 package com.dmitriid.tetrad.services;
 
-import com.dmitriid.tetrad.interfaces.ManagedService;
+import com.dmitriid.tetrad.interfaces.IManagedService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class ServiceFactory {
-  public static ManagedService getService(String className) {
+  public static IManagedService getService(String className) {
     Class[] intArgsClass = new Class[] {};
 
     Constructor intArgsConstructor = null;
 
     try {
-      intArgsConstructor = Class.forName("com.dmitriid.tetrad." + className).getConstructor(intArgsClass);
+      intArgsConstructor = Class.forName("com.dmitriid.tetrad.services." + className).getConstructor(intArgsClass);
     } catch (NoSuchMethodException | ClassNotFoundException e) {
       e.printStackTrace();
       System.exit(1);
     }
-    return (ManagedService) createObject(intArgsConstructor, new Object[0]);
+    return (IManagedService) createObject(intArgsConstructor, new Object[0]);
   }
 
   private static Object createObject(Constructor constructor, Object[] arguments) {
@@ -32,10 +32,8 @@ public class ServiceFactory {
       System.out.println(e);
       System.exit(1);
     } catch (InvocationTargetException e) {
-      System.out.println(e);
-      System.out.println(e.getMessage());
       e.printStackTrace();
-      System.out.println(e.getCause());
+      System.out.println(e.getCause().getMessage());
       System.exit(1);
     }
     return object;

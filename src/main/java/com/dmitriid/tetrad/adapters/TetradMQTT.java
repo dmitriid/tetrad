@@ -1,5 +1,6 @@
-package com.dmitriid.tetrad;
+package com.dmitriid.tetrad.adapters;
 
+import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,18 +8,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import static java.lang.System.exit;
-
 public class TetradMQTT implements MqttCallback {
-    private TetradMQTTConfig mqttConfig;
-    private MqttAsyncClient mqttSession;
-    private TetradCallback callback;
+    private final TetradMQTTConfig mqttConfig;
+    private       MqttAsyncClient  mqttSession;
+    private       ITetradCallback  callback;
 
     public TetradMQTT(JsonNode config){
         mqttConfig = new TetradMQTTConfig(config);
     }
 
-    public void start(TetradCallback callback){
+    public void start(ITetradCallback callback){
         try {
             this.callback = callback;
             mqttSession = new MqttAsyncClient(mqttConfig.getBroker(),
@@ -99,7 +98,7 @@ class TetradMQTTConfig {
     private TetradMQTTTopic firehose;
     private TetradMQTTTopic subscribe;
 
-    public TetradMQTTConfig(JsonNode config){
+    TetradMQTTConfig(JsonNode config){
         setClientid(config.at("/clientid").asText());
         setBroker(config.at("/broker").asText());
         setFirehose(new TetradMQTTTopic(config.at("/firehose")));
@@ -110,7 +109,7 @@ class TetradMQTTConfig {
         return clientid;
     }
 
-    public void setClientid(String clientid) {
+    private void setClientid(String clientid) {
         this.clientid = clientid;
     }
 
@@ -118,7 +117,7 @@ class TetradMQTTConfig {
         return broker;
     }
 
-    public void setBroker(String broker) {
+    private void setBroker(String broker) {
         this.broker = broker;
     }
 
@@ -126,7 +125,7 @@ class TetradMQTTConfig {
         return firehose;
     }
 
-    public void setFirehose(TetradMQTTTopic firehose) {
+    private void setFirehose(TetradMQTTTopic firehose) {
         this.firehose = firehose;
     }
 
@@ -134,7 +133,7 @@ class TetradMQTTConfig {
         return subscribe;
     }
 
-    public void setSubscribe(TetradMQTTTopic subscribe) {
+    private void setSubscribe(TetradMQTTTopic subscribe) {
         this.subscribe = subscribe;
     }
 }
@@ -152,7 +151,7 @@ class TetradMQTTTopic {
         return topic;
     }
 
-    public void setTopic(String topic) {
+    private void setTopic(String topic) {
         this.topic = topic;
     }
 
@@ -160,7 +159,7 @@ class TetradMQTTTopic {
         return qos;
     }
 
-    public void setQos(int qos) {
+    private void setQos(int qos) {
         this.qos = qos;
     }
 }
@@ -168,7 +167,7 @@ class TetradMQTTTopic {
 
 class TetradMQTTConnectionListener implements IMqttActionListener{
 
-    private TetradMQTT mqtt;
+    private final TetradMQTT mqtt;
 
     TetradMQTTConnectionListener(TetradMQTT mqtt){
         this.mqtt = mqtt;
