@@ -3,7 +3,6 @@ package com.dmitriid.tetrad;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 import com.dmitriid.tetrad.services.ServiceException;
-import com.dmitriid.tetrad.services.ServiceFactory;
 import com.dmitriid.tetrad.utils.CommandLine;
 
 public class Tetrad {
@@ -18,7 +17,7 @@ public class Tetrad {
     ServiceConfiguration configuration = new ServiceConfiguration(configFile);
     String handler = configuration.getConfiguration().at("/handler").asText();
 
-    IManagedService service = ServiceFactory.getService(handler);
+    IManagedService service = TetradObjectFactory.getService(handler);
 
     new Tetrad(service, configuration).run();
   }
