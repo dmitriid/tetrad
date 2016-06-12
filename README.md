@@ -36,3 +36,9 @@ convert the message according to a configuration and post the new message
 back to a specified mqtt topic.
 
 See `X-to-Y.yml` for samle mapping configs.
+
+## Transformations
+
+Additionally apply a random transformation on a `FirehoseMessage`.
+
+See `config/samples/slack-to-xmpp.yml` for samle transformation config.

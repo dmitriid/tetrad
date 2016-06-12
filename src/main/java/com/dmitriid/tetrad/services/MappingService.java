@@ -1,7 +1,9 @@
 package com.dmitriid.tetrad.services;
 
+import com.dmitriid.tetrad.TetradObjectFactory;
 import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.interfaces.IManagedService;
+import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.utils.JIDUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 public class MappingService implements IManagedService {
     private List<TetradMap> mapping;
+    private List<ITransformer> transformers = new ArrayList<>();
 
     private TetradMQTT mqtt;
 
@@ -19,8 +22,12 @@ public class MappingService implements IManagedService {
         mqtt = new TetradMQTT(configuration.getConfiguration().at("/mqtt"));
 
         mapping = new ArrayList<>();
-        for(JsonNode map : configuration.getConfiguration().at("/mapping")){
+        for(JsonNode map : configuration.getConfiguration().at("/mapping")) {
             mapping.add(new TetradMap(map));
+        }
+
+        for(JsonNode transform : configuration.getConfiguration().at("/transformations")) {
+            transformers.add(TetradObjectFactory.getTransformer(transform.asText()));
         }
     }
 
@@ -34,10 +41,17 @@ public class MappingService implements IManagedService {
 
     }
 
-    private void firehose(FirehoseMessage firehoseMessage){
+    private void firehose(FirehoseMessage firehoseMessage) {
+
         mapping.stream().forEach(tetradMap -> {
-            if(tetradMap.matches(firehoseMessage)){
-                mqtt.sendMessage(tetradMap.convert(firehoseMessage));
+            if(tetradMap.matches(firehoseMessage)) {
+                FirehoseMessage msg = tetradMap.convert(firehoseMessage);
+
+                for(ITransformer transfomer : transformers) {
+                    msg = transfomer.transform(msg);
+                }
+
+                mqtt.sendMessage(tetradMap.convert(msg));
             }
         });
     }
@@ -56,7 +70,7 @@ class TetradMap {
 
     private final Boolean shortUserNames;
 
-    TetradMap(JsonNode config){
+    TetradMap(JsonNode config) {
         fromService = config.at("/from_service").asText(null);
         fromChannel = config.at("/from_channel").asText(null);
         fromType = config.at("/from_type").asText(null);
@@ -78,23 +92,23 @@ class TetradMap {
 
     }
 
-    FirehoseMessage convert(FirehoseMessage firehoseMessage){
+    FirehoseMessage convert(FirehoseMessage firehoseMessage) {
         FirehoseMessage fm = (FirehoseMessage) firehoseMessage.clone();
 
-        if(toService != null){
+        if(toService != null) {
             fm.service = toService;
         }
-        if(toChannel != null){
+        if(toChannel != null) {
             fm.channel = toChannel;
         }
-        if(toType != null){
+        if(toType != null) {
             fm.type = toType;
         }
-        if(toSubtype != null){
+        if(toSubtype != null) {
             fm.subtype = toSubtype;
         }
 
-        if(shortUserNames){
+        if(shortUserNames) {
             fm.user = JIDUtils.jid_to_slack_username(fm.user);
         }
 

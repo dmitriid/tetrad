@@ -18,6 +18,9 @@ mapping:
     to_channel: "erlang-talks"
     short_username: false
 
+transformations:
+  - TransformSlackSmileys
+
 mqtt:
   clientid: sxm
   broker: tcp://localhost:1883

@@ -92,11 +92,11 @@
             <artifactId>TelegramBots</artifactId>
             <version>LATEST</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegram-bots</artifactId>
+        <dependency>
+            <groupId>com.vdurmont</groupId>
+            <artifactId>emoji-java</artifactId>
             <version>RELEASE</version>
-        </dependency-->
+        </dependency>
     </dependencies>
    <!-- <executions>
         <execution>
