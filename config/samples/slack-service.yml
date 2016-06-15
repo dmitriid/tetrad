@@ -19,6 +19,10 @@ slack:
     channels:
       - random
 
+transformations:
+  - TransformSlackUsers
+  - TransformSlackChannels
+
 mqtt:
   clientid: slack-firehose
   broker: tcp://localhost:1883

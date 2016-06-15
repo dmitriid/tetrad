@@ -41,4 +41,8 @@ See `X-to-Y.yml` for samle mapping configs.
 
 Additionally apply a random transformation on a `FirehoseMessage`.
 
+### Before the get to `firehose`
+See `config/samples/slack-service.yml` for samle transformation config.
+
+### Before the get to the dedicated service
 See `config/samples/slack-to-xmpp.yml` for samle transformation config.
