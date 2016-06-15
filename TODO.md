@@ -1,7 +1,8 @@
 Slack -> xxx:
 
 - DONE ~~:smiley: -> actual smiley~~
-- @username is displayed as <@U...>
+- DONE  ~~@username is displayed as <@U...>~~
+- DONE  ~~#channel is displayed as <#U...>~~
 - /giphy etc.
 - unescape HTML ? (for XMPP/Telegram at least)
 - username has to be `user@`
