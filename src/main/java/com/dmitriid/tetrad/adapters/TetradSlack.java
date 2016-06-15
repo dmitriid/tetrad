@@ -1,6 +1,8 @@
 package com.dmitriid.tetrad.adapters;
 
+import com.dmitriid.tetrad.interfaces.IGenericService;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
+import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,18 +14,17 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class TetradSlack implements SlackMessagePostedListener {
-    private final SlackConfig     slackConfig;
-    private       SlackSession    slackSession;
-    private       ITetradCallback callback;
+public class TetradSlack implements SlackMessagePostedListener, IGenericService {
+    private final SlackConfig        slackConfig;
+    private       SlackSession       slackSession;
+    private       ITetradCallback    callback;
+    private final List<ITransformer> transformers;
 
-    public TetradSlack(JsonNode configuration) {
+    public TetradSlack(JsonNode configuration, List<ITransformer> transformers) {
         slackConfig = new SlackConfig(configuration);
+        this.transformers = transformers;
     }
 
     public void run(ITetradCallback callback) {
@@ -59,17 +60,45 @@ public class TetradSlack implements SlackMessagePostedListener {
             return;
         }
 
-        callback.execute(new FirehoseMessage(
+        FirehoseMessage firehoseMessage = new FirehoseMessage(
                 "slack",
                 "post",
                 sender.getUserName(),
                 slackConfig.identifier,
                 event.getChannel().getName(),
                 event.getMessageContent()
-        ));
+        );
+
+        for(ITransformer transfomer : transformers) {
+            firehoseMessage = transfomer.transform(firehoseMessage, this);
+        }
+
+        callback.execute(firehoseMessage);
     }
 
-    static class SlackConfig {
+    @Override
+    public String getChannelById(String id) {
+        return slackSession
+                .getChannels()
+                .stream()
+                .filter(slackChannel -> slackChannel.getId().equals(id))
+                .findFirst()
+                .map(SlackChannel::getName)
+                .orElse(id);
+    }
+
+    @Override
+    public String getUserById(String id) {
+        return slackSession
+                .getUsers()
+                .stream()
+                .filter(slackChannel -> slackChannel.getId().equals(id))
+                .findFirst()
+                .map(SlackUser::getUserName)
+                .orElse(id);
+    }
+
+    private static class SlackConfig {
         final String botid;
         final String identifier;
         final Map<String, Boolean> ignore   = new HashMap<>();
