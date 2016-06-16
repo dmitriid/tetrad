@@ -82,7 +82,12 @@ public class TetradXMPP {
 
     private void handleMessage(Message message, String room) {
         String jid = message.getFrom().replace(room + "/", "");
-        if(ignore.contains(JIDUtils.bareJID(jid))){
+
+        long count = ignore.stream()
+                           .filter(s -> jid.equals(s) || jid.matches(s))
+                           .count();
+
+        if(count > 0){
             return;
         }
 
@@ -150,7 +155,8 @@ public class TetradXMPP {
 
                 final String roomJID = firehoseMessage.channel + "@" + getChatService();
                 perUserChatRoom = new MultiUserChat(perUserConn, roomJID);
-                perUserChatRoom.join(perUserConn.getUser(), password);
+                perUserChatRoom.join(perUserConn.getUser());//, password);
+                //perUserChatRoom.changeNickname(firehoseMessage.user + '@' + firehoseMessage.type);
                 perUserRooms.put(localUser, perUserChatRoom);
             }
 
