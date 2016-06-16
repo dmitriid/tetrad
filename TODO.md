@@ -1,3 +1,5 @@
+# Priority
+
 Slack -> xxx:
 
 - DONE ~~:smiley: -> actual smiley~~
@@ -11,25 +13,29 @@ Slack -> XMPP:
 
 - http://git.emojione.com/demos/ascii-smileys.html
 
-xxx -> Telegram:
-
-- html escape/unescape
-- что-то делать со ссылками http://dmitriid.com/i/gc4ukqjsgw4u1qb3.png
-
-Telegram -> xxx
-
-- стикеры
-- юзер должен быть user@telegram или т.п.
 
 xxx -> Slack
 
-- команды (текст, начинающийся с /) отсылать командами
+- commands (text beginning with `/`) should be sent as commands 
+(careful about `/o\` and `/me` etc.)
+
 
 xxx -> XMPP
 
-- что-то сделать по поводу логина с ресурсами
+- Per=user login with different resources
 
 xxx, xxx -> xxx
 
-- Логгировать все ошибки
+- Log all errors
 
+### Extremely low priority
+
+xxx -> Telegram:
+
+- html escape/unescape
+- do something about links http://dmitriid.com/i/gc4ukqjsgw4u1qb3.png
+
+Telegram -> xxx
+
+- stickers
+- user should be user@telegram or similar
