@@ -1,6 +1,6 @@
 package com.dmitriid.tetrad.transformers;
 
-import com.dmitriid.tetrad.interfaces.IGenericService;
+import com.dmitriid.tetrad.interfaces.IAdapter;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 
@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class TransformSlackChannels implements ITransformer {
 
-    public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IGenericService service){
+    public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IAdapter service){
         FirehoseMessage msg = (FirehoseMessage) firehoseMessage.clone();
 
         Pattern pattern = Pattern.compile("<#([^\\|>]+)(|[^>]+)?>");

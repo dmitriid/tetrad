@@ -1,22 +1,23 @@
 package com.dmitriid.tetrad.adapters;
 
-import com.dmitriid.tetrad.interfaces.IGenericService;
+import com.dmitriid.tetrad.interfaces.IAdapter;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
+import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
+import com.ullink.slack.simpleslackapi.listeners.SlackMessageUpdatedListener;
 
 import java.io.IOException;
 import java.util.*;
 
-public class TetradSlack implements SlackMessagePostedListener, IGenericService {
+public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private final SlackConfig        slackConfig;
     private       SlackSession       slackSession;
     private       ITetradCallback    callback;
@@ -30,6 +31,7 @@ public class TetradSlack implements SlackMessagePostedListener, IGenericService 
     public void run(ITetradCallback callback) {
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
         slackSession.addMessagePostedListener(this);
+        slackSession.addMessageUpdatedListener(new Updated());
         this.callback = callback;
         try {
             slackSession.connect();
@@ -116,5 +118,13 @@ public class TetradSlack implements SlackMessagePostedListener, IGenericService 
                 channels.add(chnl.asText());
             }
         }
+    }
+}
+
+class Updated implements SlackMessageUpdatedListener {
+    @Override
+    public void onEvent(SlackMessageUpdated event, SlackSession session) {
+        System.out.println(event.getEventType());
+        System.out.println(event.getNewMessage());
     }
 }

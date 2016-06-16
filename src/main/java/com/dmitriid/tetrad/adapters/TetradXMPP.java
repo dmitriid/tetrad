@@ -86,6 +86,8 @@ public class TetradXMPP {
             return;
         }
 
+        System.out.println(message.getFrom());
+
         FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
                                                               message.getType().name(),
                                                               JIDUtils.bareJID(jid) + "@" + getChatService(),
