@@ -73,6 +73,7 @@ public class TetradXMPP {
                 MultiUserChat chat = new MultiUserChat(xmppConnection, roomJID);
                 chat.join(xmppConnection.getUser(), password, history, SmackConfiguration.getPacketReplyTimeout());
                 chat.addMessageListener(packet -> this.handleMessage((Message) packet, roomJID));
+                chat.changeNickname("β");
                 connectedRooms.put(room, chat);
             }
         } catch (XMPPException e) {
