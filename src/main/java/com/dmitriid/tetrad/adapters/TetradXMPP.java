@@ -8,6 +8,8 @@ import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.XHTMLManager;
+import org.jivesoftware.smackx.XHTMLText;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -122,13 +124,33 @@ public class TetradXMPP {
         MultiUserChat chat = connectedRooms.get(firehoseMessage.channel);
         if (!chat.isJoined()) return;
 
+        if(resource_per_user){
+            postAsUser(chat, firehoseMessage);
+        } else {
+            postDefaultMessage(chat, firehoseMessage);
+        }
+    }
+
+    private void postDefaultMessage(MultiUserChat chat, FirehoseMessage firehoseMessage){
+        Message msg = chat.createMessage();
+        msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
+
+        XHTMLText xhtml = new XHTMLText(null, null);
+        xhtml.appendOpenStrongTag();
+        xhtml.append(firehoseMessage.user);
+        xhtml.appendCloseStrongTag();
+        xhtml.append(": ");
+        xhtml.append(firehoseMessage.content);
+
+        XHTMLManager.addBody(msg, xhtml.toString());
         try {
-            if(resource_per_user){
-                postAsUser(chat, firehoseMessage);
-            } else {
-                chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
-            }
+            chat.sendMessage(msg);
         } catch (XMPPException e) {
+            try {
+                chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+            } catch (XMPPException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -138,7 +160,7 @@ public class TetradXMPP {
             XMPPConnection perUserConn = new XMPPConnection(service_domain);
             if(!perUserConnections.containsKey(firehoseMessage.user)) {
                 if (perUserConnections.size() == max_resources) {
-                    defaultChat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
+                    postDefaultMessage(defaultChat, firehoseMessage);
                     return;
                 } else {
                     perUserConn.connect();
