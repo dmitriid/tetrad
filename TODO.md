@@ -11,8 +11,9 @@ Slack -> xxx:
 
 Slack -> XMPP:
 
+- DOM ~~username passed as <strong>username</strong> to XMPP~~
 - http://git.emojione.com/demos/ascii-smileys.html
-
+- markdown to xmpp xhtml
 
 xxx -> Slack
 
@@ -27,6 +28,9 @@ xxx -> XMPP
 xxx, xxx -> xxx
 
 - Log all errors
+
+xxx -> IRC -> xxx:
+- implement IRC support (req. by Mendor)
 
 ### Extremely low priority
 
