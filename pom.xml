@@ -8,20 +8,6 @@
     <artifactId>tetrad</artifactId>
     <version>0.1</version>
 
- <!--   <configuration>
-        <createDependencyReducedPom>true</createDependencyReducedPom>
-        <filters>
-            <filter>
-                <artifact>*:*</artifact>
-                <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                </excludes>
-            </filter>
-        </filters>
-    </configuration>
--->
     <build>
         <plugins>
             <plugin>
