@@ -97,6 +97,11 @@
             <artifactId>emoji-java</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.allbegray</groupId>
+            <artifactId>slack-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
     </dependencies>
    <!-- <executions>
         <execution>
