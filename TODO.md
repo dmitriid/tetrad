@@ -7,13 +7,14 @@ Slack -> xxx:
 - DONE  ~~#channel is displayed as <#U...>~~
 - /giphy etc.
 - DONE ~~unescape HTML ? (for XMPP/Telegram at least)~~
-- username has to be `user@`
+- username has to be `user@slack-service`?
 
 Slack -> XMPP:
 
 - DOM ~~username passed as <strong>username</strong> to XMPP~~
 - http://git.emojione.com/demos/ascii-smileys.html
 - markdown to xmpp xhtml
+- convert `\n` to `<br>` for XMPP XHTML messages (
 
 xxx -> Slack
 
