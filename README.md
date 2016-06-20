@@ -11,13 +11,19 @@ broker urls in configs)
 
 # Running:
 
-Currently only runnable through IDEA. Add the following to your app args:
+## Fat jar
 
 ```
---config /path/to/your/service/config.yml
+mvn package
+```
+and then
+```
+java -jar tetrad-0.1-with-dependencies.jar --config /path/to/config.yml
 ```
 
-Main class is `com.dmitriid.Tetrad`
+## Docker
+
+See `Dockerfile`. The `Dockerfile` currently in repo will start several different services. Use it to creat your own configurations
 
 ## Services
 
