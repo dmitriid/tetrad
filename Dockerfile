@@ -1,0 +1,38 @@
+FROM ubuntu:16.04
+
+MAINTAINER Dmitrii 'Mamut' Dimandt <dmitrii@dmitriid.com>
+
+ENTRYPOINT ["/tetrad/bin/docker-init.sh"]
+VOLUME /tetrad/config
+
+# Set the locale
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
+# java
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y  software-properties-common && \
+    add-apt-repository ppa:webupd8team/java -y && \
+    apt-get update && \
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get install -y oracle-java8-installer && \
+    apt-get clean
+
+# utils
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y tmux && \
+    apt-get install -y sudo && \
+    apt-get install -y logrotate && \
+    apt-get clean
+
+RUN wget https://bintray.com/artifact/download/erlio/vernemq/deb/trusty/vernemq_0.12.5p5-1_amd64.deb -O /tmp/vernemq_0.12.5p5-1_amd64.deb && \
+    dpkg -i /tmp/vernemq_0.12.5p5-1_amd64.deb
+
+COPY target/tetrad-0.1-jar-with-dependencies.jar /tetrad/java/tetrad.jar
+COPY bin/docker-init.sh /tetrad/bin/docker-init.sh
+COPY config/tetrad.tmux /tetrad/bin/tetrad.tmux
+COPY config/vernemq.conf /etc/vernemq/vernemq.conf
