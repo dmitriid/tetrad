@@ -25,6 +25,10 @@ java -jar tetrad-0.1-with-dependencies.jar --config /path/to/config.yml
 
 See `Dockerfile`. The `Dockerfile` currently in repo will start several different services. Use it to creat your own configurations
 
+# What
+
+Config files specify what exactly `tetrad` should be running. These could be services or mappers.
+
 ## Services
 
 These will listen to all incoming messages from a service (Slack, 
@@ -47,8 +51,8 @@ See `X-to-Y.yml` for samle mapping configs.
 
 Additionally apply a random transformation on a `FirehoseMessage`.
 
-### Before the get to `firehose`
+### Before the messages get to `firehose`
 See `config/samples/slack-service.yml` for samle transformation config.
 
-### Before the get to the dedicated service
+### Before the messages get to the dedicated service
 See `config/samples/slack-to-xmpp.yml` for samle transformation config.
