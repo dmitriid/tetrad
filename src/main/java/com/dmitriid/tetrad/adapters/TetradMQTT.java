@@ -17,9 +17,8 @@ public class TetradMQTT implements MqttCallback {
         mqttConfig = new TetradMQTTConfig(config);
     }
 
-    public void start(ITetradCallback callback){
+    private void connect(){
         try {
-            this.callback = callback;
             mqttSession = new MqttAsyncClient(mqttConfig.getBroker(),
                                               mqttConfig.getClientid(),
                                               new MemoryPersistence());
@@ -30,9 +29,14 @@ public class TetradMQTT implements MqttCallback {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+
+    }
+    public void start(ITetradCallback callback){
+        this.callback = callback;
+        this.connect();
     }
 
-    public void onSuccessfulConnect(){
+    void onSuccessfulConnect(){
         mqttSession.setCallback(this);
         try {
             mqttSession.subscribe(mqttConfig.getSubscribe().getTopic(),
@@ -45,18 +49,7 @@ public class TetradMQTT implements MqttCallback {
     @Override
     public void connectionLost(Throwable cause) {
         cause.printStackTrace();
-
-/*
-        MqttConnectOptions connOpts = new MqttConnectOptions();
-        connOpts.setCleanSession(true);
-
-        try {
-            mqttSession.connect(connOpts, new TetradMQTTConnectionListener(this));
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-*/
-
+        this.connect();
     }
 
     @Override
