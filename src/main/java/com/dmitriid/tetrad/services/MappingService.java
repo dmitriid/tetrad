@@ -51,7 +51,7 @@ public class MappingService implements IManagedService {
                     msg = transfomer.transform(msg);
                 }
 
-                mqtt.sendMessage(tetradMap.convert(msg));
+                mqtt.sendMessage(msg);
             }
         });
     }
