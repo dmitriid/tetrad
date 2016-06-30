@@ -6,4 +6,5 @@ sudo: required
 services:
   - docker
 after_success:
+  - mvn package
   - docker build -t dmitriid/tetrad .
