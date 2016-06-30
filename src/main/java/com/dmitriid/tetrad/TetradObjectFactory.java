@@ -6,8 +6,6 @@ import com.dmitriid.tetrad.interfaces.ITransformer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static javafx.scene.input.KeyCode.T;
-
 public class TetradObjectFactory {
 
     public static IManagedService getService(String name){
@@ -23,6 +21,7 @@ public class TetradObjectFactory {
 
         Constructor<Object> intArgsConstructor = null;
         try {
+            //noinspection unchecked
             intArgsConstructor =
                     (Constructor<Object>) Class.forName(name).getConstructor(intArgsClass);
         } catch (NoSuchMethodException | ClassNotFoundException e) {

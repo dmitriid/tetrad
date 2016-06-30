@@ -20,7 +20,6 @@ public class CommandLine {
       if (matcher.find()) {
         if (optionName != null) { // in case there was an option without a parameter before this one
           _options.put(matcher.group(1), null);
-          optionName = null;
         }
         optionName = matcher.group(1);
       } else {

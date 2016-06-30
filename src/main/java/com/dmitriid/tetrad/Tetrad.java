@@ -2,7 +2,6 @@ package com.dmitriid.tetrad;
 
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
-import com.dmitriid.tetrad.services.ServiceException;
 import com.dmitriid.tetrad.utils.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

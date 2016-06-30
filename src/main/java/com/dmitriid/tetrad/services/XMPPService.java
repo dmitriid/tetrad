@@ -3,9 +3,6 @@ package com.dmitriid.tetrad.services;
 import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.adapters.TetradXMPP;
 import com.dmitriid.tetrad.interfaces.IManagedService;
-import com.dmitriid.tetrad.services.FirehoseMessage;
-import com.dmitriid.tetrad.services.ServiceConfiguration;
-import com.dmitriid.tetrad.services.ServiceException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +13,7 @@ import java.util.Map;
 public class XMPPService implements IManagedService {
     private final Map<String, TetradXMPP> xmpps = new HashMap<>();
     private TetradMQTT mqtt;
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Override
     public void init(ServiceConfiguration configuration) {

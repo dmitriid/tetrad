@@ -6,7 +6,6 @@ import com.dmitriid.tetrad.adapters.TetradSlack;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ public class SlackService implements IManagedService {
 
     private final Map<String, TetradSlack> slacks = new HashMap<>();
     private TetradMQTT mqtt;
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Override
     public void init(ServiceConfiguration configuration) {
@@ -52,8 +51,6 @@ public class SlackService implements IManagedService {
     }
 
     private void postToSlack(FirehoseMessage firehoseMessage){
-        ObjectMapper mapper = new ObjectMapper();
-
         logger.info("postToSlack: " + firehoseMessage.toLogString());
         if(!slacks.containsKey(firehoseMessage.service)){
             logger.info("Service " + firehoseMessage.service + " not found");

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MappingService implements IManagedService {
     private List<TetradMap> mapping;
-    private List<ITransformer> transformers = new ArrayList<>();
+    private final List<ITransformer> transformers = new ArrayList<>();
 
     private TetradMQTT mqtt;
 
@@ -43,11 +43,11 @@ public class MappingService implements IManagedService {
 
     private void firehose(FirehoseMessage firehoseMessage) {
 
-        mapping.stream().forEach(tetradMap -> {
-            if(tetradMap.matches(firehoseMessage)) {
+        mapping.forEach(tetradMap -> {
+            if (tetradMap.matches(firehoseMessage)) {
                 FirehoseMessage msg = tetradMap.convert(firehoseMessage);
 
-                for(ITransformer transfomer : transformers) {
+                for (ITransformer transfomer : transformers) {
                     msg = transfomer.transform(msg);
                 }
 

@@ -19,7 +19,7 @@ public class TetradMQTT implements MqttCallback {
   private final TetradMQTTConfig mqttConfig;
   private       MqttAsyncClient  mqttSession;
   private       ITetradCallback  callback;
-  private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+  private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
   public TetradMQTT(JsonNode config){
     mqttConfig = new TetradMQTTConfig(config);
@@ -94,8 +94,7 @@ public class TetradMQTT implements MqttCallback {
 
     try {
       ObjectMapper mapper = new ObjectMapper();
-      FirehoseMessage firehoseMessage = null;
-      firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
+      FirehoseMessage firehoseMessage = mapper.readValue(msg, FirehoseMessage.class);
       callback.execute(firehoseMessage);
     } catch (IOException e) {
       logger.error(MessageFormat.format("Error deserializing message. Message: {0}, Original Message: {2}",

@@ -25,7 +25,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private       SlackSession       slackSession;
     private       ITetradCallback    callback;
     private final List<ITransformer> transformers;
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradSlack(JsonNode configuration, List<ITransformer> transformers) {
         slackConfig = new SlackConfig(configuration);

@@ -1,6 +1,6 @@
 package com.dmitriid.tetrad.utils;
 
-public class TelegramUtils {
+class TelegramUtils {
     public static String chatTitle(String fullname){
         return fullname.split("::")[0];
     }

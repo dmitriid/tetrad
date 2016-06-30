@@ -17,10 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TetradXMPP {
     private final String service_domain;
@@ -41,11 +41,9 @@ public class TetradXMPP {
     private final HashMap<String/*user*/, XMPPConnection>
             perUserConnections = new HashMap<>();
 
-    private XMPPConnection xmppConnection;
-
     private ITetradCallback callback;
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradXMPP(JsonNode config){
         service_domain = config.at("/service_domain").asText();
@@ -74,7 +72,7 @@ public class TetradXMPP {
                                         ));
         this.callback = callback;
         try {
-            xmppConnection = new XMPPConnection(service_domain);
+            XMPPConnection xmppConnection = new XMPPConnection(service_domain);
             xmppConnection.connect();
 
             xmppConnection.login(username, password, resource);

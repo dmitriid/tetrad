@@ -13,27 +13,26 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TetradTelegram extends TelegramLongPollingBot {
     private final String botid;
     private final String username;
-    private final List<String> rooms = new ArrayList<>();
+    //private final List<String> rooms = new ArrayList<>();
     private ITetradCallback callback;
 
     private Long startTimestamp;
 
-    private TelegramBotsApi bot;
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradTelegram(JsonNode configuration){
         botid = configuration.at("/botid").asText();
         username = configuration.at("/username").asText();
 
+/*
         for(JsonNode room : configuration.at("/channels")){
             rooms.add(room.asText());
         }
+*/
     }
 
     public void start(ITetradCallback callback){
@@ -43,7 +42,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
                                         ));
         this.startTimestamp = System.currentTimeMillis() / 1000L;
         this.callback = callback;
-        bot = new TelegramBotsApi();
+        TelegramBotsApi bot = new TelegramBotsApi();
         try {
             bot.registerBot(this);
         } catch (TelegramApiException e) {
