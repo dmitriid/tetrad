@@ -2,25 +2,24 @@
 
 Slack -> xxx:
 
-- DONE ~~:smiley: -> actual smiley~~
-- DONE  ~~@username is displayed as <@U...>~~
-- DONE  ~~#channel is displayed as <#U...>~~
+- ✔︎ ~~:smiley: -> actual smiley~~
+- ✔︎  ~~@username is displayed as <@U...>~~
+- ✔︎  ~~#channel is displayed as <#U...>~~
+- ✔︎ ~~unescape HTML ? (for XMPP/Telegram at least)~~
 - /giphy etc.
-- DONE ~~unescape HTML ? (for XMPP/Telegram at least)~~
 - username has to be `user@slack-service`?
 
 Slack -> XMPP:
 
-- DOM ~~username passed as <strong>username</strong> to XMPP~~
+- ✔︎ ~~username passed as <strong>username</strong> to XMPP~~
 - http://git.emojione.com/demos/ascii-smileys.html
 - markdown to xmpp xhtml
-- convert `\n` to `<br>` for XMPP XHTML messages (
+- convert `\n` to `<br>` for XMPP XHTML messages
 
 xxx -> Slack
 
 - commands (text beginning with `/`) should be sent as commands 
 (careful about `/o\` and `/me` etc.)
-
 
 xxx -> XMPP
 
@@ -30,10 +29,10 @@ xxx, xxx -> xxx
 
 - Log all errors
 
+### Extremely low priority
+
 xxx -> IRC -> xxx:
 - implement IRC support (req. by Mendor)
-
-### Extremely low priority
 
 xxx -> Telegram:
 
