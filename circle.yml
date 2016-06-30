@@ -9,4 +9,4 @@ deployment:
     commands:
       - mvn package
       - docker info
-      - docker build -t dmitriid/tetrad .
+      - docker build -t -f ./Dockerfile.build dmitriid/tetrad .
