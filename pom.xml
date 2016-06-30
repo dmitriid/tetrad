@@ -7,6 +7,9 @@
     <groupId>com.dmitriid</groupId>
     <artifactId>tetrad</artifactId>
     <version>0.1</version>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
 
     <build>
         <plugins>
@@ -17,6 +20,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+                <version>3.5.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
