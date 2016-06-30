@@ -7,11 +7,10 @@ import static org.junit.Assert.*;
 
 public class JIDUtilsTest {
     @Test
-    public void jid_to_slack_username() throws Exception {
+    public void jid_to_slack_username() {
         assertEquals("JID is shortened",
                      "dmitriid@c.j.r",
                      JIDUtils.jid_to_slack_username("dmitriid@conference.jabber.ru")
                     );
     }
-
 }

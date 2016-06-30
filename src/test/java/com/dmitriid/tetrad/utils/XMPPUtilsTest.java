@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 public class XMPPUtilsTest {
   @Test
-  public void toXMPPXHTML() throws Exception {
+  public void toXMPPXHTML() {
     XHTMLText xhtml = new XHTMLText(null, null);
 
     String textWithNL = "a\nb\nc";

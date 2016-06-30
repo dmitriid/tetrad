@@ -18,7 +18,7 @@ public class MappingService implements IManagedService {
 
 
     @Override
-    public void init(ServiceConfiguration configuration) throws ServiceException {
+    public void init(ServiceConfiguration configuration) {
         mqtt = new TetradMQTT(configuration.getConfiguration().at("/mqtt"));
 
         mapping = new ArrayList<>();
@@ -32,12 +32,12 @@ public class MappingService implements IManagedService {
     }
 
     @Override
-    public void start() throws ServiceException {
+    public void start() {
         mqtt.start(this::firehose);
     }
 
     @Override
-    public void shutdown() throws ServiceException {
+    public void shutdown() {
 
     }
 

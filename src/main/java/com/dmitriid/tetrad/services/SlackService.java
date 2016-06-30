@@ -6,6 +6,9 @@ import com.dmitriid.tetrad.adapters.TetradSlack;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,9 +19,12 @@ public class SlackService implements IManagedService {
 
     private final Map<String, TetradSlack> slacks = new HashMap<>();
     private TetradMQTT mqtt;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Override
-    public void init(ServiceConfiguration configuration) throws ServiceException {
+    public void init(ServiceConfiguration configuration) {
+        logger.debug("Init");
+
         List<ITransformer> transformers = new ArrayList<>();
 
         for(JsonNode transform : configuration.getConfiguration().at("/transformations")) {
@@ -34,18 +40,23 @@ public class SlackService implements IManagedService {
     }
 
     @Override
-    public void start() throws ServiceException {
+    public void start() {
+        logger.debug("Start");
         slacks.forEach((s, slack) -> slack.run(this.mqtt::sendMessage));
         mqtt.start(this::postToSlack);
     }
 
     @Override
-    public void shutdown() throws ServiceException {
-
+    public void shutdown() {
+        logger.debug("Shutdown");
     }
 
     private void postToSlack(FirehoseMessage firehoseMessage){
+        ObjectMapper mapper = new ObjectMapper();
+
+        logger.info("postToSlack: " + firehoseMessage.toLogString());
         if(!slacks.containsKey(firehoseMessage.service)){
+            logger.info("Service " + firehoseMessage.service + " not found");
             return;
         }
 

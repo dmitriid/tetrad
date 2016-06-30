@@ -4,6 +4,8 @@ import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.adapters.TetradTelegram;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +13,11 @@ import java.util.Map;
 public class TelegramService implements IManagedService {
     private final Map<String, TetradTelegram> telegrams = new HashMap<>();
     private TetradMQTT mqtt;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Override
-    public void init(ServiceConfiguration configuration) throws ServiceException {
+    public void init(ServiceConfiguration configuration) {
+        logger.debug("Init");
         for(JsonNode config : configuration.getConfiguration().at("/telegram")){
             telegrams.put(config.at("/identifier").asText(), new TetradTelegram(config));
         }
@@ -21,13 +25,14 @@ public class TelegramService implements IManagedService {
     }
 
     @Override
-    public void start() throws ServiceException {
+    public void start() {
+        logger.debug("Start");
         mqtt.start(this::postToTelegram);
         telegrams.forEach((s, tetradTelegram) -> tetradTelegram.start(this.mqtt::sendMessage));
     }
 
     @Override
-    public void shutdown() throws ServiceException {
+    public void shutdown() {
 
     }
 
@@ -39,6 +44,7 @@ public class TelegramService implements IManagedService {
 
         telegrams.get(firehoseMessage.service).post(firehoseMessage);
 */
+        logger.info("postToTelegram: " + firehoseMessage.toLogString());
         telegrams.forEach((s, tetradTelegram) -> tetradTelegram.post(firehoseMessage));
     }
 }

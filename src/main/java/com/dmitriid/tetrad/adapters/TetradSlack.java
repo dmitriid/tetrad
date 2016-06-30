@@ -13,8 +13,11 @@ import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessageUpdatedListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 
 public class TetradSlack implements SlackMessagePostedListener, IAdapter {
@@ -22,6 +25,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private       SlackSession       slackSession;
     private       ITetradCallback    callback;
     private final List<ITransformer> transformers;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradSlack(JsonNode configuration, List<ITransformer> transformers) {
         slackConfig = new SlackConfig(configuration);
@@ -29,6 +33,10 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     }
 
     public void run(ITetradCallback callback) {
+        logger.debug("Run");
+        logger.info(MessageFormat.format("Connecting with botid {0}",
+                                         slackConfig.botid
+                                        ));
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
         slackSession.addMessagePostedListener(this);
         slackSession.addMessageUpdatedListener(new Updated());
@@ -36,7 +44,10 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
         try {
             slackSession.connect();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error connecting with botid {0}. Message: {1}",
+                                              slackConfig.botid,
+                                              e.getMessage()
+                                             ));
         }
     }
 
@@ -45,6 +56,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     }
 
     public void post(FirehoseMessage firehoseMessage) {
+        logger.info("Publish message " + firehoseMessage.toLogString());
         if (!slackSession.isConnected()) return;
         SlackChannel slackChannel = slackSession.findChannelByName(firehoseMessage.channel);
         if (slackChannel == null) {
@@ -56,20 +68,21 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     @Override
     public void onEvent(SlackMessagePosted event, SlackSession session) {
         SlackUser sender = event.getSender();
+        FirehoseMessage firehoseMessage = new FirehoseMessage(
+          "slack",
+          "post",
+          sender.getUserName(),
+          slackConfig.identifier,
+          event.getChannel().getName(),
+          event.getMessageContent()
+        );
+
+        logger.info("Got post event from service: " + firehoseMessage.toLogString());
 
         Boolean isBot = slackConfig.ignore.getOrDefault(sender.getUserName(), null);
         if (isBot != null && isBot == sender.isBot()) {
             return;
         }
-
-        FirehoseMessage firehoseMessage = new FirehoseMessage(
-                "slack",
-                "post",
-                sender.getUserName(),
-                slackConfig.identifier,
-                event.getChannel().getName(),
-                event.getMessageContent()
-        );
 
         for(ITransformer transfomer : transformers) {
             firehoseMessage = transfomer.transform(firehoseMessage, this);
@@ -124,7 +137,5 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
 class Updated implements SlackMessageUpdatedListener {
     @Override
     public void onEvent(SlackMessageUpdated event, SlackSession session) {
-        System.out.println(event.getEventType());
-        System.out.println(event.getNewMessage());
     }
 }

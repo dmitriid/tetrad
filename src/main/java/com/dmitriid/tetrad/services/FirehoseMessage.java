@@ -1,5 +1,9 @@
 package com.dmitriid.tetrad.services;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class FirehoseMessage implements Cloneable {
   public String type;  // "slack", "xmpp"
   public String subtype; // "post", "edit", "subscribe", "login"
@@ -26,20 +30,26 @@ public class FirehoseMessage implements Cloneable {
   }
 
   @Override
-  public Object clone(){
+  public Object clone() {
     try {
       return super.clone();
     } catch (CloneNotSupportedException e) {
       e.printStackTrace();
       return new FirehoseMessage(
-              this.type,
-              this.subtype,
-              this.user,
-              this.service,
-              this.channel,
-              this.content
+        this.type,
+        this.subtype,
+        this.user,
+        this.service,
+        this.channel,
+        this.content
       );
     }
+  }
+
+  public String toLogString(){
+    return MessageFormat.format("type: {0}, subtype: {1}, user: {2}, service: {3}, channel: {4}, content: {5}",
+                                type, subtype, user, service, channel,
+                                Arrays.stream(content.split("\n")).collect(Collectors.joining(" ")));
   }
 
 }

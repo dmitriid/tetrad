@@ -3,6 +3,8 @@ package com.dmitriid.tetrad.adapters;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -10,6 +12,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
     private Long startTimestamp;
 
     private TelegramBotsApi bot;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradTelegram(JsonNode configuration){
         botid = configuration.at("/botid").asText();
@@ -33,13 +37,20 @@ public class TetradTelegram extends TelegramLongPollingBot {
     }
 
     public void start(ITetradCallback callback){
+        logger.debug("Run");
+        logger.info(MessageFormat.format("Connecting with botid {0}",
+                                         botid
+                                        ));
         this.startTimestamp = System.currentTimeMillis() / 1000L;
         this.callback = callback;
         bot = new TelegramBotsApi();
         try {
             bot.registerBot(this);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error connecting with botid {0}. Message: {1}",
+                                              botid,
+                                              e.getMessage()
+                                             ));
         }
     }
 
@@ -50,6 +61,14 @@ public class TetradTelegram extends TelegramLongPollingBot {
         }
 
         Message message = update.getMessage();
+        FirehoseMessage firehoseMessage = new FirehoseMessage("telegram",
+                                                              "post",
+                                                              message.getFrom().getUserName(),
+                                                              message.getChat().getId().toString(),
+                                                              message.getChat().getTitle(),
+                                                              message.getText());
+
+        logger.info("Got event from service: " + firehoseMessage.toLogString());
 
         if(message.getDate() < startTimestamp){
             return;
@@ -59,12 +78,6 @@ public class TetradTelegram extends TelegramLongPollingBot {
             return;
         }
 
-        FirehoseMessage firehoseMessage = new FirehoseMessage("telegram",
-                                                              "post",
-                                                              message.getFrom().getUserName(),
-                                                              message.getChat().getId().toString(),
-                                                              message.getChat().getTitle(),
-                                                              message.getText());
         callback.execute(firehoseMessage);
     }
 
@@ -79,6 +92,8 @@ public class TetradTelegram extends TelegramLongPollingBot {
     }
 
     public void post(FirehoseMessage firehoseMessage){
+        logger.info("Publish message " + firehoseMessage.toLogString());
+
         SendMessage sendMessageReq = new SendMessage();
         sendMessageReq.setChatId(firehoseMessage.service);
 
@@ -87,7 +102,10 @@ public class TetradTelegram extends TelegramLongPollingBot {
         try {
             sendMessage(sendMessageReq);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error publishing message. Message: {0} Original message: {1}",
+                                              e.getMessage(),
+                                              firehoseMessage.toLogString()
+                                             ));
         }
     }
 }

@@ -13,7 +13,10 @@ import org.jivesoftware.smackx.XHTMLManager;
 import org.jivesoftware.smackx.XHTMLText;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -42,6 +45,8 @@ public class TetradXMPP {
 
     private ITetradCallback callback;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+
     public TetradXMPP(JsonNode config){
         service_domain = config.at("/service_domain").asText();
         setChatService(config.at("/chat_service").asText());
@@ -61,6 +66,12 @@ public class TetradXMPP {
     }
 
     public void start(ITetradCallback callback){
+        logger.debug("start");
+        logger.info(MessageFormat.format("Connecting to service {0} with username {1} and resource {2}",
+                                         service_domain,
+                                         username,
+                                         resource
+                                        ));
         this.callback = callback;
         try {
             xmppConnection = new XMPPConnection(service_domain);
@@ -80,12 +91,25 @@ public class TetradXMPP {
                 connectedRooms.put(room, chat);
             }
         } catch (XMPPException e) {
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error connecting to service {0} with username {1} and resource {2}. Message: {3}",
+                                              service_domain,
+                                              username,
+                                              resource,
+                                              e.getMessage()
+                                             ));
         }
     }
 
     private void handleMessage(Message message, String room) {
         String jid = message.getFrom().replace(room + "/", "");
+        FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
+                                                              message.getType().name(),
+                                                              JIDUtils.bareJID(jid) + "@" + getChatService(),
+                                                              getChatService(),
+                                                              room,
+                                                              message.getBody());
+
+        logger.info("Got message from service: " + firehoseMessage.toLogString());
 
         long count = ignore.stream()
                            .filter(s -> jid.equals(s) || jid.matches(s))
@@ -95,14 +119,6 @@ public class TetradXMPP {
             return;
         }
 
-        System.out.println(message.getFrom());
-
-        FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
-                                                              message.getType().name(),
-                                                              JIDUtils.bareJID(jid) + "@" + getChatService(),
-                                                              getChatService(),
-                                                              room,
-                                                              message.getBody());
         callback.execute(firehoseMessage);
     }
 
@@ -115,6 +131,8 @@ public class TetradXMPP {
     }
 
     public void post(FirehoseMessage firehoseMessage){
+        logger.info("Publish message " + firehoseMessage.toLogString());
+
         if (!chat_service.equals(firehoseMessage.service)) {
             return;
         }
@@ -123,7 +141,19 @@ public class TetradXMPP {
             return;
         }
         MultiUserChat chat = connectedRooms.get(firehoseMessage.channel);
-        if (!chat.isJoined()) return;
+        if (!chat.isJoined()) {
+            try {
+                chat.join(chat.getNickname());
+            } catch (XMPPException e) {
+                logger.error(MessageFormat.format("Error connecting to chatroom {0} at service {1} with username {2}. Message: {3}",
+                                                  chat.getRoom(),
+                                                  service_domain,
+                                                  username,
+                                                  e.getMessage()
+                                                 ));
+                return;
+            }
+        }
 
         if(resource_per_user){
             postAsUser(chat, firehoseMessage);
@@ -151,9 +181,17 @@ public class TetradXMPP {
             try {
                 chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
             } catch (XMPPException e1) {
-                e1.printStackTrace();
+                logger.error(MessageFormat.format("Error publishing plain message to chatroom {0}. Message: {1}. Original message: {2}",
+                                                  chat.getRoom(),
+                                                  e.getMessage(),
+                                                  firehoseMessage.toLogString()
+                                                 ));
             }
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error publishing XHTML-enabled message to chatroom {0}. Message: {1}. Original message: {2}",
+                                              chat.getRoom(),
+                                              e.getMessage(),
+                                              firehoseMessage.toLogString()
+                                             ));
         }
     }
 
@@ -187,7 +225,10 @@ public class TetradXMPP {
 
             perUserChatRoom.sendMessage(firehoseMessage.content);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            logger.error(MessageFormat.format("Error publishing as user to chatroom. Message: {0}. Original message: {1}",
+                                              e.getMessage(),
+                                              firehoseMessage.toLogString()
+                                             ));
         }
     }
 }
