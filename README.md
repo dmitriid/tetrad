@@ -1,4 +1,4 @@
-# Tetrad: cross-chat-platform integration
+# ![](./icon.png) Tetrad: cross-chat-platform integration
 
 Send messages from an XMPP chatroom to a Slack channel and vice versa. 
 Connect Telegram groups. Have four-five-six-way chats
@@ -23,11 +23,13 @@ java -jar tetrad-0.1-with-dependencies.jar --config /path/to/config.yml
 
 ## Docker
 
-See `Dockerfile`. The `Dockerfile` currently in repo will start several different services. Use it to creat your own configurations
+See `Dockerfile`. The `Dockerfile` currently in repo will start several
+different services. Use it to creat your own configurations
 
 # What
 
-Config files specify what exactly `tetrad` should be running. These could be services or mappers.
+Config files specify what exactly `tetrad` should be running. These could be
+services or mappers.
 
 ## Services
 
@@ -56,3 +58,9 @@ See `config/samples/slack-service.yml` for samle transformation config.
 
 ### Before the messages get to the dedicated service
 See `config/samples/slack-to-xmpp.yml` for samle transformation config.
+
+# Credits
+
+Icon made by [Dario Ferrando](http://www.flaticon.com/authors/dario-ferrando)
+from [www.flaticon.com](http://www.flaticon.com) is licensed by
+[CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
