@@ -24,7 +24,12 @@ java -jar tetrad-0.1-with-dependencies.jar --config /path/to/config.yml
 ## Docker
 
 See `Dockerfile`. The `Dockerfile` currently in repo will start several
-different services. Use it to creat your own configurations
+different services. Use it to create your own configurations
+
+### Makefile
+
+Run `make all` to build source code, create and run docker images. Rum `make run`
+to just run the created docker image
 
 # What
 
