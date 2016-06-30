@@ -1,12 +1,20 @@
 # ![](./icon.png) Tetrad: cross-chat-platform integration
 
-Send messages from an XMPP chatroom to a Slack channel and vice versa. 
-Connect Telegram groups. Have four-five-six-way chats
+Send messages from an XMPP chatroom to a Slack channel and vice versa.
+Connect Telegram groups. Have four-five-six-way chats.
+
+The `tetrad` name comes from [`tetra`](https://en.wiktionary.org/wiki/tetra-#Prefix)
+meaning "four" and `d` for "daemon", as originally it was going to connect
+four platforms.
+
+The word "тетрадь" ([`tetrádʹ [tʲɪˈtratʲ]`](https://en.wiktionary.org/wiki/тетрадь#Pronunciation))
+means "exercise book, notebook" in Russian, hence the icon (I know it's a
+clipboard, not a notebook, but I like it :) ).
 
 # Requirements
 
 - This code
-- An MQTT server with anon user enabled running on local server (set 
+- An MQTT server with anon user enabled running on local server (set
 broker urls in configs)
 
 # Running:
@@ -23,8 +31,8 @@ java -jar tetrad-0.1-with-dependencies.jar --config /path/to/config.yml
 
 ## Docker
 
-See `Dockerfile`. The `Dockerfile` currently in repo will start several
-different services. Use it to create your own configurations
+See `Dockerfile.build` and `Dockerfile.run`. The `Dockerfile.run` currently in repo
+will start several different services. Use it to create your own configurations
 
 ### Makefile
 
@@ -38,10 +46,10 @@ services or mappers.
 
 ## Services
 
-These will listen to all incoming messages from a service (Slack, 
+These will listen to all incoming messages from a service (Slack,
 Telegram etc.) and post them to a `firehose` queue in MQTT.
 
-They will listen to a specified mqtt topic and post messages on that 
+They will listen to a specified mqtt topic and post messages on that
 topic back to the service.
 
 See `X-service.yml` for sample service configs.
