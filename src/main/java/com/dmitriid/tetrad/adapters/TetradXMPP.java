@@ -3,6 +3,7 @@ package com.dmitriid.tetrad.adapters;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.utils.JIDUtils;
+import com.dmitriid.tetrad.utils.XMPPUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
@@ -13,10 +14,10 @@ import org.jivesoftware.smackx.XHTMLText;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class TetradXMPP {
     private final String service_domain;
@@ -140,7 +141,8 @@ public class TetradXMPP {
         xhtml.append(firehoseMessage.user);
         xhtml.appendCloseStrongTag();
         xhtml.append(": ");
-        xhtml.append(firehoseMessage.content);
+
+        XMPPUtils.toXMPPXHTML(firehoseMessage.content, xhtml);
 
         XHTMLManager.addBody(msg, xhtml.toString());
         try {

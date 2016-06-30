@@ -14,7 +14,7 @@ Slack -> XMPP:
 - ✔︎ ~~username passed as <strong>username</strong> to XMPP~~
 - http://git.emojione.com/demos/ascii-smileys.html
 - markdown to xmpp xhtml
-- convert `\n` to `<br>` for XMPP XHTML messages
+- ✔︎ convert `\n` to `<br>` for XMPP XHTML messages
 
 xxx -> Slack
 
