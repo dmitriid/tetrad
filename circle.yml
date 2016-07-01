@@ -10,4 +10,5 @@ deployment:
       - mvn package
       - docker build -f ./Dockerfile.run -t dmitriid/tetrad .
       - docker login -e $DOCKER_REGISTRY_EMAIL -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD registry.dmitriid.com
-      - docker push dmitriid/tetrad
+      - docker tag dmitriid/tetrad registry.dmitriid.com/tetrad:$CIRCLE_SHA1
+      - docker push registry.dmitriid.com/tetrad:$CIRCLE_SHA1
