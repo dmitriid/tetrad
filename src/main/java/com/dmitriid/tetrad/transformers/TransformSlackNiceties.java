@@ -73,7 +73,7 @@ public class TransformSlackNiceties implements ITransformer {
     return new FirehoseMessage(
       "slack",
       "post",
-      "",
+      "β",
       service.getIdentifier(),
       event.getChannel().getName(),
       MessageFormat.format("*{0}*: {1}...", attachment.getTitle(), words)
