@@ -24,9 +24,6 @@ RUN apt-get update && \
 # utils
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y tmux && \
-    apt-get install -y sudo && \
-    apt-get install -y logrotate && \
     apt-get install -y maven &&\
     apt-get clean
 
