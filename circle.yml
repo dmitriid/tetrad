@@ -9,5 +9,5 @@ deployment:
     commands:
       - mvn package
       - docker build -f ./Dockerfile.run -t dmitriid/tetrad .
-      - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD registry.dmitriid.com
+      - docker login -e $DOCKER_REGISTRY_EMAIL -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD registry.dmitriid.com
       - docker push dmitriid/tetrad
