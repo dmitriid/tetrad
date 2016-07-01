@@ -1,4 +1,4 @@
-# ![](./icon.png) Tetrad: cross-chat-platform integration
+# ![](./icon.png) Tetrad: cross-chat-platform integration [![CircleCI](https://circleci.com/gh/dmitriid/tetrad.svg?style=svg)](https://circleci.com/gh/dmitriid/tetrad)
 
 Send messages from an XMPP chatroom to a Slack channel and vice versa.
 Connect Telegram groups. Have four-five-six-way chats.
