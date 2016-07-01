@@ -3,10 +3,10 @@
 Slack -> xxx:
 
 - ✔︎ ~~:smiley: -> actual smiley~~
-- ✔︎  ~~@username is displayed as <@U...>~~
-- ✔︎  ~~#channel is displayed as <#U...>~~
+- ✔︎ ~~@username is displayed as <@U...>~~
+- ✔︎ ~~#channel is displayed as <#U...>~~
 - ✔︎ ~~unescape HTML ? (for XMPP/Telegram at least)~~
-- /giphy etc.
+- ✔︎ ~~/giphy, /gif, link expansion~~
 - username has to be `user@slack-service`?
 
 Slack -> XMPP:

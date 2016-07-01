@@ -67,9 +67,9 @@
             <version>RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Ullink</groupId>
+            <groupId>com.github.dmitriid</groupId>
             <artifactId>simple-slack-api</artifactId>
-            <version>0.5.1</version>
+            <version>0.5.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

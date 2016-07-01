@@ -4,7 +4,9 @@ import com.dmitriid.tetrad.interfaces.IAdapter;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
+import com.dmitriid.tetrad.transformers.TransformSlackNiceties;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
@@ -39,7 +41,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
                                         ));
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
         slackSession.addMessagePostedListener(this);
-        slackSession.addMessageUpdatedListener(new Updated());
+        slackSession.addMessageUpdatedListener(this::onUpdateEvent);
         this.callback = callback;
         try {
             slackSession.connect();
@@ -67,6 +69,9 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
 
     @Override
     public void onEvent(SlackMessagePosted event, SlackSession session) {
+
+        ArrayList<SlackAttachment> attachs = event.getAttachments();
+
         SlackUser sender = event.getSender();
         FirehoseMessage firehoseMessage = new FirehoseMessage(
           "slack",
@@ -88,7 +93,19 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
             firehoseMessage = transfomer.transform(firehoseMessage, this);
         }
 
-        callback.execute(firehoseMessage);
+        if(!firehoseMessage.content.isEmpty()) callback.execute(firehoseMessage);
+
+        FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(firehoseMessage, this, event);
+        Optional.ofNullable(possibleFollowup).ifPresent(msg -> {
+            callback.execute(msg);
+        });
+    }
+
+    public void onUpdateEvent(SlackMessageUpdated event, SlackSession slackSession){
+        FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(new FirehoseMessage(), this, event);
+        Optional.ofNullable(possibleFollowup).ifPresent(msg -> {
+            callback.execute(msg);
+        });
     }
 
     @Override
