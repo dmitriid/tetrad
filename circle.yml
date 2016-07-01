@@ -8,5 +8,4 @@ deployment:
     branch: master
     commands:
       - mvn package
-      - docker info
-      - docker build -f ./Dockerfile.build -t dmitriid/tetrad .
+      - docker build -f ./Dockerfile.run -t dmitriid/tetrad .
