@@ -1,0 +1,216 @@
+Changelog
+=========
+
+0.1 (2016-07-02)
+----------------
+
+- Minor code cleanup for readability. [Dmitrii Dimandt]
+
+- Apply Google code style to code. [Dmitrii Dimandt]
+
+- More logging everywhere. [Dmitrii Dimandt]
+
+- Use β as stand-in for Slack's "no-user" messages. [Dmitrii Dimandt]
+
+- Handle /gify, /gif and link expansion. [Dmitrii Dimandt]
+
+- Proper location of log files. [Dmitrii Dimandt]
+
+- Merge pull request #5 from dmitriid/feature/new-log-dir. [Dmitrii
+  'Mamut' Dimandt]
+
+  New location for log files
+
+- New location for log files. [Dmitrii Dimandt]
+
+- Use latest tag by default when pushing. [Dmitrii Dimandt]
+
+- Tag docker image for Circle CI. [Dmitrii Dimandt]
+
+- Add Circle CI badge. [Dmitrii Dimandt]
+
+- Email for Circle CI deploy. [Dmitrii Dimandt]
+
+- Correct order of arguments to login to registry. [Dmitrii Dimandt]
+
+- Push to private docker registry with Circle CI. [Dmitrii Dimandt]
+
+- Remove Travis-CI integration. [Dmitrii Dimandt]
+
+- Merge pull request #4 from Cy6erBr4in/cleanup-dockerfile-build.
+  [Dmitrii 'Mamut' Dimandt]
+
+  Clean up Dockerfile.build
+
+- Clean up Dockerfile.build. [Alexander Dergachev]
+
+- Use correct Docker file to build images on CIs. [Dmitrii Dimandt]
+
+- Finally (?) setting correct params to docker build in CI. [Dmitrii
+  Dimandt]
+
+- Update README. [Dmitrii Dimandt]
+
+- Update Dockerfiles in CIs. [Dmitrii Dimandt]
+
+- Update README with Makefile instructions. [Dmitrii Dimandt]
+
+- Code cleanups based on analysis suggestions. [Dmitrii Dimandt]
+
+- Merge pull request #3 from Cy6erBr4in/docker-file-for-build. [Dmitrii
+  'Mamut' Dimandt]
+
+  Dockerfile for build
+
+- Add Makefile. [Alexander Dergachev]
+
+- Add Dockerfile.build. [Alexander Dergachev]
+
+- Rename Dockerfile to Dockerfile.run. [Alexander Dergachev]
+
+- Update CIs to run mvn package before docker. [Dmitrii Dimandt]
+
+- Update circle.yml to build docker in deployment step. [Dmitrii
+  Dimandt]
+
+- Update .travis.yml to only build docker on successful build. [Dmitrii
+  Dimandt]
+
+- Update circle.yml to build docker image. [Dmitrii Dimandt]
+
+- Update circle.yml to use JDK 8. [Dmitrii Dimandt]
+
+- Update .travis.yml to build docker image. [Dmitrii Dimandt]
+
+- Add Circle-CI config including JDK 8. [Dmitrii Dimandt]
+
+- Update .travis.yml to inlude Trusty and JDK 8. [Dmitrii Dimandt]
+
+- Trying to force java 1.8 on various CIs. [Dmitrii Dimandt]
+
+- Add .travis.yml. [Dmitrii Dimandt]
+
+- Add logging everywhere. [Dmitrii Dimandt]
+
+- Convert new lines to <br> in TetradXMPP. [Dmitrii Dimandt]
+
+- Update TODO. [Dmitrii Dimandt]
+
+- Add icon. [Dmitrii Dimandt]
+
+- Remove double convert of the message in TetradMapping. [Dmitrii
+  Dimandt]
+
+- Update README.md. [Dmitrii 'Mamut' Dimandt]
+
+- Update README.md. [Dmitrii 'Mamut' Dimandt]
+
+- Merge pull request #2 from Cy6erBr4in/add-docker-support. [Dmitrii
+  'Mamut' Dimandt]
+
+  Add docker support
+
+- Add tmux session configuration. [Alexander Dergachev]
+
+- Add vernemq.conf. [Alexander Dergachev]
+
+- Add docker-init.sh. [Alexander Dergachev]
+
+- Add Dockerfile. [Alexander Dergachev]
+
+- Update TODO. [Dmitrii Dimandt]
+
+- Reconnect on MQTT disconnect. [Dmitrii Dimandt]
+
+- Merge pull request #1 from Cy6erBr4in/fix-maven-build. [Dmitrii
+  'Mamut' Dimandt]
+
+  Fix maven build
+
+- Build fat jar with all dependencies. [Alexander Dergachev]
+
+- Remove commented text. [Alexander Dergachev]
+
+- Update TODO. [Dmitrii Dimandt]
+
+- Use "strong" for usernames in xxx -> XMPP. [Dmitrii Dimandt]
+
+- Use β as default bot name. [Dmitrii Dimandt]
+
+- More TODO updates. [Dmitrii Dimandt]
+
+- Allow regexps in ignore configs for XMPP. [Dmitrii Dimandt]
+
+- Update TODO. [Dmitrii Dimandt]
+
+- Convert Slack's special chars before they reach firehose. [Dmitrii
+  Dimandt]
+
+- IGenericService is now IAdapter. [Dmitrii Dimandt]
+
+- Add docs/sample configs for message transformations. [Dmitrii Dimandt]
+
+- Update TODO. [Dmitrii Dimandt]
+
+- Transform Slack users. [Dmitrii Dimandt]
+
+- Transform Slack channels. [Dmitrii Dimandt]
+
+- TetradSlack now transforms messages before they get to firehose.
+  [Dmitrii Dimandt]
+
+- Generic service definitions for transformers. [Dmitrii Dimandt]
+
+- Add Slack->XMPP to TODO. [Dmitrii Dimandt]
+
+- Add TODO. [Dmitrii Dimandt]
+
+- Telegram-to-xmpp sample config. [Dmitrii Dimandt]
+
+- Slack smiley transformation. [Dmitrii Dimandt]
+
+- A more generic class loader. [Dmitrii Dimandt]
+
+- Move files and classes around for better code structure. [Dmitrii
+  Dimandt]
+
+- Minor README update. [Dmitrii Dimandt]
+
+- Add README. [Dmitrii Dimandt]
+
+- Proper config samples. [Dmitrii Dimandt]
+
+- Telegram integration. [Dmitrii Dimandt]
+
+- Remove old obsolete classes. [Dmitrii Dimandt]
+
+- Add mapping service. [Dmitrii Dimandt]
+
+- New configuration examples. [Dmitrii Dimandt]
+
+- XMPP Firehose. [Dmitrii Dimandt]
+
+- New way of starting and running services. Slack Firehose. [Dmitrii
+  Dimandt]
+
+- Basic Slack <-> XMPP mapping and message sending works. [Dmitrii
+  Dimandt]
+
+- Update sample configs. [Dmitrii Dimandt]
+
+- XMPP to Slack connection is there. [Dmitrii Dimandt]
+
+- Add preliminary mapping. [Dmitrii Dimandt]
+
+- Use identifier for Slack bots. [Dmitrii Dimandt]
+
+- Use proper type for XMPP messages. [Dmitrii Dimandt]
+
+- A working version of XMPP Firehose. [Dmitrii Dimandt]
+
+- Working Slack Firehose. [Dmitrii Dimandt]
+
+- After some refactoring Slack Firehose stopped working. [Dmitrii
+  Dimandt]
+
+
