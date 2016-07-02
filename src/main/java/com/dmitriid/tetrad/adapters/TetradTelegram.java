@@ -27,12 +27,6 @@ public class TetradTelegram extends TelegramLongPollingBot {
     public TetradTelegram(JsonNode configuration){
         botid = configuration.at("/botid").asText();
         username = configuration.at("/username").asText();
-
-/*
-        for(JsonNode room : configuration.at("/channels")){
-            rooms.add(room.asText());
-        }
-*/
     }
 
     public void start(ITetradCallback callback){

@@ -39,7 +39,7 @@ public class XMPPService implements IManagedService {
     }
 
     private void postToXMPP(FirehoseMessage firehoseMessage) {
-        logger.info("postToSlack: " + firehoseMessage.toLogString());
+        logger.info("Publish to XMPP: " + firehoseMessage.toLogString());
         if (!xmpps.containsKey(firehoseMessage.service)) {
             logger.info("Service " + firehoseMessage.service + " not found");
             return;

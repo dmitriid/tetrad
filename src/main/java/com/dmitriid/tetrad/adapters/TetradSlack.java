@@ -6,7 +6,6 @@ import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.transformers.TransformSlackNiceties;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
@@ -15,12 +14,17 @@ import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessageUpdatedListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private final SlackConfig        slackConfig;
@@ -37,8 +41,8 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     public void run(ITetradCallback callback) {
         logger.debug("Run");
         logger.info(MessageFormat.format("Connecting with botid {0}",
-                                         slackConfig.botid
-                                        ));
+                slackConfig.botid
+        ));
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
         slackSession.addMessagePostedListener(this);
         slackSession.addMessageUpdatedListener(this::onUpdateEvent);
@@ -47,9 +51,9 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
             slackSession.connect();
         } catch (IOException e) {
             logger.error(MessageFormat.format("Error connecting with botid {0}. Message: {1}",
-                                              slackConfig.botid,
-                                              e.getMessage()
-                                             ));
+                    slackConfig.botid,
+                    e.getMessage()
+            ));
         }
     }
 
@@ -69,23 +73,21 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
 
     @Override
     public void onEvent(SlackMessagePosted event, SlackSession session) {
-
-        ArrayList<SlackAttachment> attachs = event.getAttachments();
-
         SlackUser sender = event.getSender();
         FirehoseMessage firehoseMessage = new FirehoseMessage(
-          "slack",
-          "post",
-          sender.getUserName(),
-          slackConfig.identifier,
-          event.getChannel().getName(),
-          event.getMessageContent()
+                "slack",
+                "post",
+                sender.getUserName(),
+                slackConfig.identifier,
+                event.getChannel().getName(),
+                event.getMessageContent()
         );
 
         logger.info("Got post event from service: " + firehoseMessage.toLogString());
 
         Boolean isBot = slackConfig.ignore.getOrDefault(sender.getUserName(), null);
         if (isBot != null && isBot == sender.isBot()) {
+            logger.info(MessageFormat.format("Ignore user {0} due to config", sender.getUserName()));
             return;
         }
 
@@ -102,8 +104,11 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     }
 
     public void onUpdateEvent(SlackMessageUpdated event, SlackSession slackSession){
+        logger.info("Got update event from service. Will attempt hardcoded slack conversions");
         FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(new FirehoseMessage(), this, event);
+
         Optional.ofNullable(possibleFollowup).ifPresent(msg -> {
+            logger.info(MessageFormat.format("SlackNiceties conversion result: {0}", Optional.ofNullable(possibleFollowup)));
             callback.execute(msg);
         });
     }

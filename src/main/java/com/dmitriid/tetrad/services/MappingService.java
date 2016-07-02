@@ -42,7 +42,6 @@ public class MappingService implements IManagedService {
     }
 
     private void firehose(FirehoseMessage firehoseMessage) {
-
         mapping.forEach(tetradMap -> {
             if (tetradMap.matches(firehoseMessage)) {
                 FirehoseMessage msg = tetradMap.convert(firehoseMessage);

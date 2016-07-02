@@ -88,6 +88,7 @@ public class TetradMQTT implements MqttCallback {
                                      originalMessage
                                     ));
     if(callback == null){
+      logger.error("No callback specified");
       return;
     }
     String msg = new String(message.getPayload());

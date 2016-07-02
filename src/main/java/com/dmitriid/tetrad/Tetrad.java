@@ -16,7 +16,7 @@ public class Tetrad {
   public static void main(String[] args) {
 
     Logger logger = LoggerFactory.getLogger(Tetrad.class.getCanonicalName());
-    logger.debug("Startup with args " + Arrays.toString(args));
+    logger.info("Startup with args " + Arrays.toString(args));
 
     CommandLine line = new CommandLine(args);
     String configFile = line.optionValue("config");

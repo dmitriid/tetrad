@@ -44,7 +44,7 @@ public class TelegramService implements IManagedService {
 
         telegrams.get(firehoseMessage.service).post(firehoseMessage);
 */
-        logger.info("postToTelegram: " + firehoseMessage.toLogString());
+        logger.info("Publish to Telegram: " + firehoseMessage.toLogString());
         telegrams.forEach((s, tetradTelegram) -> tetradTelegram.post(firehoseMessage));
     }
 }

@@ -51,7 +51,7 @@ public class SlackService implements IManagedService {
     }
 
     private void postToSlack(FirehoseMessage firehoseMessage){
-        logger.info("postToSlack: " + firehoseMessage.toLogString());
+        logger.info("Publish to slack: " + firehoseMessage.toLogString());
         if(!slacks.containsKey(firehoseMessage.service)){
             logger.info("Service " + firehoseMessage.service + " not found");
             return;
