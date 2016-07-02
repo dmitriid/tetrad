@@ -28,10 +28,10 @@ import java.util.Optional;
 
 public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private final SlackConfig slackConfig;
-    private SlackSession slackSession;
-    private ITetradCallback callback;
     private final List<ITransformer> transformers;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private SlackSession slackSession;
+    private ITetradCallback callback;
 
     public TetradSlack(JsonNode configuration, List<ITransformer> transformers) {
         slackConfig = new SlackConfig(configuration);

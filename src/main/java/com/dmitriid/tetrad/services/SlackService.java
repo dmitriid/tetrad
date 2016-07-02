@@ -18,8 +18,8 @@ import java.util.Map;
 public class SlackService implements IManagedService {
 
     private final Map<String, TetradSlack> slacks = new HashMap<>();
-    private TetradMQTT mqtt;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private TetradMQTT mqtt;
 
     @Override
     public void init(ServiceConfiguration configuration) {

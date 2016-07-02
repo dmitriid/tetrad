@@ -14,6 +14,11 @@ public class Tetrad {
     private final IManagedService service;
     private final ServiceConfiguration configuration;
 
+    private Tetrad(IManagedService service, ServiceConfiguration configuration) {
+        this.service = service;
+        this.configuration = configuration;
+    }
+
     public static void main(String[] args) {
 
         Logger logger = LoggerFactory.getLogger(Tetrad.class.getCanonicalName());
@@ -28,12 +33,6 @@ public class Tetrad {
         IManagedService service = TetradObjectFactory.getService(handler);
 
         new Tetrad(service, configuration).run();
-    }
-
-
-    private Tetrad(IManagedService service, ServiceConfiguration configuration) {
-        this.service = service;
-        this.configuration = configuration;
     }
 
     private void run() {

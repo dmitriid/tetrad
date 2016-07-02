@@ -25,26 +25,21 @@ import java.util.Map;
 
 public class TetradXMPP {
     private final String service_domain;
-    private String chat_service;
     private final String username;
     private final String password;
     private final String resource;
-    private Boolean resource_per_user = false;
     private final Integer max_resources;
-
     private final List<String> ignore = new ArrayList<>();
-
     private final List<String> rooms = new ArrayList<>();
     private final Map<String, MultiUserChat> connectedRooms = new HashMap<>();
-
     private final HashMap<String/*user*/, MultiUserChat>
             perUserRooms = new HashMap<>();
     private final HashMap<String/*user*/, XMPPConnection>
             perUserConnections = new HashMap<>();
-
-    private ITetradCallback callback;
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private String chat_service;
+    private Boolean resource_per_user = false;
+    private ITetradCallback callback;
 
     public TetradXMPP(JsonNode config) {
         service_domain = config.at("/service_domain").asText();

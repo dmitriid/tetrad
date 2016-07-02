@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 
 public class TetradMQTT implements MqttCallback {
     private final TetradMQTTConfig mqttConfig;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
     private MqttAsyncClient mqttSession;
     private ITetradCallback callback;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradMQTT(JsonNode config) {
         mqttConfig = new TetradMQTTConfig(config);

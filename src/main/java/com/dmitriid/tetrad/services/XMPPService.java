@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class XMPPService implements IManagedService {
     private final Map<String, TetradXMPP> xmpps = new HashMap<>();
-    private TetradMQTT mqtt;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private TetradMQTT mqtt;
 
     @Override
     public void init(ServiceConfiguration configuration) {

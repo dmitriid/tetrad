@@ -18,12 +18,10 @@ import java.text.MessageFormat;
 public class TetradTelegram extends TelegramLongPollingBot {
     private final String botid;
     private final String username;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
     //private final List<String> rooms = new ArrayList<>();
     private ITetradCallback callback;
-
     private Long startTimestamp;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     public TetradTelegram(JsonNode configuration) {
         botid = configuration.at("/botid").asText();

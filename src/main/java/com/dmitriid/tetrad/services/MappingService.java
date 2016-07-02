@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MappingService implements IManagedService {
-    private List<TetradMap> mapping;
     private final List<ITransformer> transformers = new ArrayList<>();
-
+    private List<TetradMap> mapping;
     private TetradMQTT mqtt;
 
 
