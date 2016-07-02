@@ -1,19 +1,19 @@
 package com.dmitriid.tetrad.services;
 
 public class ServiceException extends Exception {
-  public static ServiceException StartException(String reason){
-    return new ServiceException(reason, new Throwable("Error on startup"));
-  }
+    public static ServiceException StartException(String reason) {
+        return new ServiceException(reason, new Throwable("Error on startup"));
+    }
 
-  public static ServiceException RunException(String reason){
-    return new ServiceException(reason, new Throwable("Error on run"));
-  }
+    public static ServiceException RunException(String reason) {
+        return new ServiceException(reason, new Throwable("Error on run"));
+    }
 
-  public static ServiceException ShutdownException(String reason){
-    return new ServiceException(reason, new Throwable("Error on shutdown"));
-  }
+    public static ServiceException ShutdownException(String reason) {
+        return new ServiceException(reason, new Throwable("Error on shutdown"));
+    }
 
-  private ServiceException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    private ServiceException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

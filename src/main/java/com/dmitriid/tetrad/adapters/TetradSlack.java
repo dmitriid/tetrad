@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TetradSlack implements SlackMessagePostedListener, IAdapter {
-    private final SlackConfig        slackConfig;
-    private       SlackSession       slackSession;
-    private       ITetradCallback    callback;
+    private final SlackConfig slackConfig;
+    private SlackSession slackSession;
+    private ITetradCallback callback;
     private final List<ITransformer> transformers;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
@@ -91,11 +91,11 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
             return;
         }
 
-        for(ITransformer transfomer : transformers) {
+        for (ITransformer transfomer : transformers) {
             firehoseMessage = transfomer.transform(firehoseMessage, this);
         }
 
-        if(!firehoseMessage.content.isEmpty()) callback.execute(firehoseMessage);
+        if (!firehoseMessage.content.isEmpty()) callback.execute(firehoseMessage);
 
         FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(firehoseMessage, this, event);
         Optional.ofNullable(possibleFollowup).ifPresent(msg -> {
@@ -103,7 +103,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
         });
     }
 
-    public void onUpdateEvent(SlackMessageUpdated event, SlackSession slackSession){
+    public void onUpdateEvent(SlackMessageUpdated event, SlackSession slackSession) {
         logger.info("Got update event from service. Will attempt hardcoded slack conversions");
         FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(new FirehoseMessage(), this, event);
 
@@ -138,14 +138,14 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
     private static class SlackConfig {
         final String botid;
         final String identifier;
-        final Map<String, Boolean> ignore   = new HashMap<>();
-        final List<String>         channels = new ArrayList<>();
+        final Map<String, Boolean> ignore = new HashMap<>();
+        final List<String> channels = new ArrayList<>();
 
-        SlackConfig(JsonNode config){
+        SlackConfig(JsonNode config) {
             botid = config.at("/botid").asText();
             identifier = config.at("/identifier").asText();
 
-            for(JsonNode ignr : config.at("/ignore")){
+            for (JsonNode ignr : config.at("/ignore")) {
                 ignore.put(ignr.at("/username").asText(), ignr.at("/bot").asBoolean(false));
             }
 

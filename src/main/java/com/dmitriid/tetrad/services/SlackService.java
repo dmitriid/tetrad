@@ -6,6 +6,7 @@ import com.dmitriid.tetrad.adapters.TetradSlack;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +27,11 @@ public class SlackService implements IManagedService {
 
         List<ITransformer> transformers = new ArrayList<>();
 
-        for(JsonNode transform : configuration.getConfiguration().at("/transformations")) {
+        for (JsonNode transform : configuration.getConfiguration().at("/transformations")) {
             transformers.add(TetradObjectFactory.getTransformer(transform.asText()));
         }
 
-        for(JsonNode node : configuration.getConfiguration().at("/slack")){
+        for (JsonNode node : configuration.getConfiguration().at("/slack")) {
             TetradSlack slack = new TetradSlack(node, transformers);
             slacks.put(slack.getIdentifier(), slack);
         }
@@ -50,9 +51,9 @@ public class SlackService implements IManagedService {
         logger.debug("Shutdown");
     }
 
-    private void postToSlack(FirehoseMessage firehoseMessage){
+    private void postToSlack(FirehoseMessage firehoseMessage) {
         logger.info("Publish to slack: " + firehoseMessage.toLogString());
-        if(!slacks.containsKey(firehoseMessage.service)){
+        if (!slacks.containsKey(firehoseMessage.service)) {
             logger.info("Service " + firehoseMessage.service + " not found");
             return;
         }

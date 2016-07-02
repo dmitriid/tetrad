@@ -12,7 +12,7 @@ public class TransformSlackSpecialChars implements ITransformer {
     }
 
     @Override
-    public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service){
+    public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service) {
         return transform(firehoseMessage);
     }
 
@@ -20,9 +20,9 @@ public class TransformSlackSpecialChars implements ITransformer {
     public FirehoseMessage transform(final FirehoseMessage firehoseMessage) {
         FirehoseMessage msg = (FirehoseMessage) firehoseMessage.clone();
         msg.content = msg.content
-                         .replaceAll("&gt;", ">")
-                         .replaceAll("&lt;", "<")
-                         .replaceAll("&amp;", "&");
+                .replaceAll("&gt;", ">")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&amp;", "&");
         return msg;
     }
 }

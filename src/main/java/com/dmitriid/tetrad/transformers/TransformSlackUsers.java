@@ -14,13 +14,13 @@ public class TransformSlackUsers implements ITransformer {
         return transform(firehoseMessage, service);
     }
 
-    public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IAdapter service){
+    public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IAdapter service) {
         FirehoseMessage msg = (FirehoseMessage) firehoseMessage.clone();
 
         Pattern pattern = Pattern.compile("<@([^\\|>]+)(|[^>]+)?>");
         Matcher matcher = pattern.matcher(msg.content);
 
-        while(matcher.find()){
+        while (matcher.find()) {
             msg.content = msg.content.replace(matcher.group(0), service.getUserById(matcher.group(1)));
         }
 

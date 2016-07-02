@@ -22,11 +22,11 @@ public class MappingService implements IManagedService {
         mqtt = new TetradMQTT(configuration.getConfiguration().at("/mqtt"));
 
         mapping = new ArrayList<>();
-        for(JsonNode map : configuration.getConfiguration().at("/mapping")) {
+        for (JsonNode map : configuration.getConfiguration().at("/mapping")) {
             mapping.add(new TetradMap(map));
         }
 
-        for(JsonNode transform : configuration.getConfiguration().at("/transformations")) {
+        for (JsonNode transform : configuration.getConfiguration().at("/transformations")) {
             transformers.add(TetradObjectFactory.getTransformer(transform.asText()));
         }
     }
@@ -94,20 +94,20 @@ class TetradMap {
     FirehoseMessage convert(FirehoseMessage firehoseMessage) {
         FirehoseMessage fm = (FirehoseMessage) firehoseMessage.clone();
 
-        if(toService != null) {
+        if (toService != null) {
             fm.service = toService;
         }
-        if(toChannel != null) {
+        if (toChannel != null) {
             fm.channel = toChannel;
         }
-        if(toType != null) {
+        if (toType != null) {
             fm.type = toType;
         }
-        if(toSubtype != null) {
+        if (toSubtype != null) {
             fm.subtype = toSubtype;
         }
 
-        if(shortUserNames) {
+        if (shortUserNames) {
             fm.user = JIDUtils.jid_to_slack_username(fm.user);
         }
 

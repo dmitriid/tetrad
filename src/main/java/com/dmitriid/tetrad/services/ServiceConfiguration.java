@@ -8,20 +8,20 @@ import java.io.File;
 import java.io.IOException;
 
 public class ServiceConfiguration {
-  private JsonNode configuration;
+    private JsonNode configuration;
 
-  public ServiceConfiguration(String fileName){
+    public ServiceConfiguration(String fileName) {
 
-    YAMLFactory ymlFactory = new YAMLFactory();
+        YAMLFactory ymlFactory = new YAMLFactory();
 
-    try {
-      this.configuration = new ObjectMapper().readTree(ymlFactory.createParser(new File(fileName)));
-    } catch (IOException e) {
-      e.printStackTrace();
+        try {
+            this.configuration = new ObjectMapper().readTree(ymlFactory.createParser(new File(fileName)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-  }
 
-  public JsonNode getConfiguration(){
-    return this.configuration;
-  }
+    public JsonNode getConfiguration() {
+        return this.configuration;
+    }
 }

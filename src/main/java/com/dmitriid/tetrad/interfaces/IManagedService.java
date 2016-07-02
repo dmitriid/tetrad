@@ -3,8 +3,9 @@ package com.dmitriid.tetrad.interfaces;
 import com.dmitriid.tetrad.services.ServiceConfiguration;
 
 public interface IManagedService {
-  void init(ServiceConfiguration configuration);
-  void start();
+    void init(ServiceConfiguration configuration);
 
-  void shutdown();
+    void start();
+
+    void shutdown();
 }

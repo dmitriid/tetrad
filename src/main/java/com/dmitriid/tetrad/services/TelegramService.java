@@ -4,6 +4,7 @@ import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.adapters.TetradTelegram;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ public class TelegramService implements IManagedService {
     @Override
     public void init(ServiceConfiguration configuration) {
         logger.debug("Init");
-        for(JsonNode config : configuration.getConfiguration().at("/telegram")){
+        for (JsonNode config : configuration.getConfiguration().at("/telegram")) {
             telegrams.put(config.at("/identifier").asText(), new TetradTelegram(config));
         }
         mqtt = new TetradMQTT(configuration.getConfiguration().at("/mqtt"));

@@ -8,11 +8,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class TetradObjectFactory {
 
-    public static IManagedService getService(String name){
+    public static IManagedService getService(String name) {
         return (IManagedService) getObject("com.dmitriid.tetrad.services." + name);
     }
 
-    public static ITransformer getTransformer(String name){
+    public static ITransformer getTransformer(String name) {
         return (ITransformer) getObject("com.dmitriid.tetrad.transformers." + name);
     }
 

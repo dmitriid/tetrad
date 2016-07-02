@@ -13,7 +13,7 @@ public class TransformSlackSmileys implements ITransformer {
     }
 
     @Override
-    public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service){
+    public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service) {
         return transform(firehoseMessage);
     }
 
