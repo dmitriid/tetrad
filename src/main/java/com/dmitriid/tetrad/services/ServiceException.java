@@ -12,7 +12,7 @@ public class ServiceException extends Exception {
   public static ServiceException RunException(String reason){
     return new ServiceException(reason, new Throwable("Error on run"));
   }
-  
+
   public static ServiceException ShutdownException(String reason){
     return new ServiceException(reason, new Throwable("Error on shutdown"));
   }

@@ -37,14 +37,13 @@ public class TetradMQTT implements MqttCallback {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-
     }
 
     public void start(ITetradCallback callback) {
         this.callback = callback;
         this.connect();
     }
-    
+
 
     void onSuccessfulConnect() {
         mqttSession.setCallback(this);
