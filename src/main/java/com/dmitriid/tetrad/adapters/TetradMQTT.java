@@ -5,23 +5,31 @@ import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.paho.client.mqttv3.*;
+
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class TetradMQTT implements MqttCallback {
     private final TetradMQTTConfig mqttConfig;
-    private       MqttAsyncClient  mqttSession;
-    private       ITetradCallback  callback;
+    private MqttAsyncClient mqttSession;
+    private ITetradCallback callback;
 
-    public TetradMQTT(JsonNode config){
+    public TetradMQTT(JsonNode config) {
         mqttConfig = new TetradMQTTConfig(config);
     }
 
-    private void connect(){
+    private void connect() {
         try {
             mqttSession = new MqttAsyncClient(mqttConfig.getBroker(),
-                                              mqttConfig.getClientid(),
-                                              new MemoryPersistence());
+                    mqttConfig.getClientid(),
+                    new MemoryPersistence());
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
 
@@ -31,16 +39,18 @@ public class TetradMQTT implements MqttCallback {
         }
 
     }
-    public void start(ITetradCallback callback){
+
+    public void start(ITetradCallback callback) {
         this.callback = callback;
         this.connect();
     }
+    
 
-    void onSuccessfulConnect(){
+    void onSuccessfulConnect() {
         mqttSession.setCallback(this);
         try {
             mqttSession.subscribe(mqttConfig.getSubscribe().getTopic(),
-                                  mqttConfig.getSubscribe().getQos());
+                    mqttConfig.getSubscribe().getQos());
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -54,7 +64,7 @@ public class TetradMQTT implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        if(callback == null){
+        if (callback == null) {
             return;
         }
         String msg = new String(message.getPayload());
@@ -70,7 +80,7 @@ public class TetradMQTT implements MqttCallback {
 
     }
 
-    public void sendMessage(FirehoseMessage firehoseMessage){
+    public void sendMessage(FirehoseMessage firehoseMessage) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -86,12 +96,12 @@ public class TetradMQTT implements MqttCallback {
 }
 
 class TetradMQTTConfig {
-    private String          clientid;
-    private String          broker;
+    private String clientid;
+    private String broker;
     private TetradMQTTTopic firehose;
     private TetradMQTTTopic subscribe;
 
-    TetradMQTTConfig(JsonNode config){
+    TetradMQTTConfig(JsonNode config) {
         setClientid(config.at("/clientid").asText());
         setBroker(config.at("/broker").asText());
         setFirehose(new TetradMQTTTopic(config.at("/firehose")));
@@ -133,9 +143,9 @@ class TetradMQTTConfig {
 
 class TetradMQTTTopic {
     private String topic;
-    private int    qos;
+    private int qos;
 
-    TetradMQTTTopic(JsonNode config){
+    TetradMQTTTopic(JsonNode config) {
         setTopic(config.at("/topic").asText());
         setQos(config.at("/qos").asInt(0));
     }
@@ -158,11 +168,11 @@ class TetradMQTTTopic {
 }
 
 
-class TetradMQTTConnectionListener implements IMqttActionListener{
+class TetradMQTTConnectionListener implements IMqttActionListener {
 
     private final TetradMQTT mqtt;
 
-    TetradMQTTConnectionListener(TetradMQTT mqtt){
+    TetradMQTTConnectionListener(TetradMQTT mqtt) {
         this.mqtt = mqtt;
     }
 
