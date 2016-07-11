@@ -12,7 +12,7 @@ Slack -> xxx:
 Slack -> XMPP:
 
 - DOM ~~username passed as <strong>username</strong> to XMPP~~
-- http://git.emojione.com/demos/ascii-smileys.html
+- http://git.emojione.com/demos/ascii-smileys.html or http://mts.io/2015/04/21/unicode-symbol-render-text-emoji/
 - markdown to xmpp xhtml
 
 xxx -> Slack
