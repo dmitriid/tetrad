@@ -206,9 +206,12 @@ public class TetradXMPP {
         msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
 
         XHTMLText xhtml = new XHTMLText(null, null);
-        xhtml.appendOpenStrongTag();
+        xhtml.appendOpenSpanTag("color: " + String.format("#%X", firehoseMessage.user.hashCode()));
         xhtml.append(firehoseMessage.user);
-        xhtml.appendCloseStrongTag();
+        xhtml.appendCloseSpanTag();
+//        xhtml.appendOpenStrongTag();
+//        xhtml.append(firehoseMessage.user);
+//        xhtml.appendCloseStrongTag();
         xhtml.append(": ");
 
         XMPPUtils.toXMPPXHTML(firehoseMessage.content, xhtml);
