@@ -15,11 +15,13 @@ Slack -> XMPP:
 - http://git.emojione.com/demos/ascii-smileys.html
 - markdown to xmpp xhtml
 - ✔︎ convert `\n` to `<br>` for XMPP XHTML messages
+- "Set channel purpose" -> Set topic
 
 xxx -> Slack
 
 - commands (text beginning with `/`) should be sent as commands 
 (careful about `/o\` and `/me` etc.)
+- set topic -> set channel purpose
 
 xxx -> XMPP
 
