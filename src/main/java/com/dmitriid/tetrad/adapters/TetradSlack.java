@@ -27,6 +27,7 @@ import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.transformers.TransformSlackNiceties;
+import com.dmitriid.tetrad.utils.MiscUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
@@ -98,7 +99,7 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
                 ""
         );
         attach.setAuthorName(firehoseMessage.user);
-        attach.setColor(String.format("#%X", firehoseMessage.user.hashCode()));
+        attach.setColor("#" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
         slackSession.sendMessage(slackChannel, "", attach);
     }
 

@@ -25,6 +25,7 @@ package com.dmitriid.tetrad.adapters;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.utils.JIDUtils;
+import com.dmitriid.tetrad.utils.MiscUtils;
 import com.dmitriid.tetrad.utils.XMPPUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -206,7 +207,7 @@ public class TetradXMPP {
         msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
 
         XHTMLText xhtml = new XHTMLText(null, null);
-        xhtml.appendOpenSpanTag("color: " + String.format("#%X", firehoseMessage.user.hashCode()));
+        xhtml.appendOpenSpanTag("color: #" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
         xhtml.append(firehoseMessage.user);
         xhtml.appendCloseSpanTag();
 //        xhtml.appendOpenStrongTag();
