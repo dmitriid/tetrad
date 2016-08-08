@@ -204,20 +204,27 @@ public class TetradXMPP {
 
     private void postDefaultMessage(MultiUserChat chat, FirehoseMessage firehoseMessage) {
         Message msg = chat.createMessage();
-        msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
 
-        XHTMLText xhtml = new XHTMLText(null, null);
-        xhtml.appendOpenSpanTag("color: #" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
-        xhtml.append(firehoseMessage.user);
-        xhtml.appendCloseSpanTag();
+        // handle XMPP commands coming from other services
+        // keep it as an attachment if it's a facepalm /o\
+        if (firehoseMessage.content.startsWith("/") && !firehoseMessage.content.startsWith("/o\\")) {
+            msg.setBody(firehoseMessage.content);
+        } else {
+            msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
+
+            XHTMLText xhtml = new XHTMLText(null, null);
+            xhtml.appendOpenSpanTag("color: #" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
+            xhtml.append(firehoseMessage.user);
+            xhtml.appendCloseSpanTag();
 //        xhtml.appendOpenStrongTag();
 //        xhtml.append(firehoseMessage.user);
 //        xhtml.appendCloseStrongTag();
-        xhtml.append(": ");
+            xhtml.append(": ");
 
-        XMPPUtils.toXMPPXHTML(firehoseMessage.content, xhtml);
+            XMPPUtils.toXMPPXHTML(firehoseMessage.content, xhtml);
 
-        XHTMLManager.addBody(msg, xhtml.toString());
+            XHTMLManager.addBody(msg, xhtml.toString());
+        }
         try {
             chat.sendMessage(msg);
         } catch (XMPPException e) {
