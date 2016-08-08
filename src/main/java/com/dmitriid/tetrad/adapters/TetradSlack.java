@@ -95,11 +95,12 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
         SlackAttachment attach = new SlackAttachment(
                 "",
                 "*" + firehoseMessage.user + "*: " + firehoseMessage.content,
-                firehoseMessage.content,
+                "*" + firehoseMessage.user + "*: " + firehoseMessage.content,
                 ""
         );
-        attach.setAuthorName(firehoseMessage.user);
+        //attach.setAuthorName(firehoseMessage.user);
         attach.setColor("#" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
+        attach.addMarkdownIn("text");
         slackSession.sendMessage(slackChannel, "", attach);
     }
 
