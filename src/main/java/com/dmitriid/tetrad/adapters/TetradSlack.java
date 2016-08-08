@@ -92,14 +92,6 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
         if (slackChannel == null) {
             return;
         }
-
-        // handle Slack commands coming from other services
-        // keep it as an attachment if it's a facepalm /o\
-        if(firehoseMessage.content.startsWith("/") && !firehoseMessage.content.startsWith("/o\\")){
-            slackSession.sendMessage(slackChannel, firehoseMessage.content);
-            return;
-        }
-
         SlackAttachment attach = new SlackAttachment(
                 "",
                 "*" + firehoseMessage.user + "*: " + firehoseMessage.content,
