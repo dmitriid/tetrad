@@ -204,10 +204,10 @@ public class TetradXMPP {
 
     private void postDefaultMessage(MultiUserChat chat, FirehoseMessage firehoseMessage) {
         Message msg = chat.createMessage();
-        msg.setBody(firehoseMessage.user + ": " + firehoseMessage.content);
+        msg.setBody(MessageFormat.format("<{0}>: {1}", firehoseMessage.user, firehoseMessage.content));
 
         XHTMLText xhtml = new XHTMLText(null, null);
-        xhtml.appendOpenSpanTag("color: #" + MiscUtils.intToRGB(firehoseMessage.user.hashCode()));
+        xhtml.appendOpenSpanTag("color: #" + MiscUtils.toRGB(firehoseMessage.user));
         xhtml.append(firehoseMessage.user);
         xhtml.appendCloseSpanTag();
 //        xhtml.appendOpenStrongTag();
