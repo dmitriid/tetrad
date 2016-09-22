@@ -28,7 +28,6 @@ import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
-
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Optional;
@@ -36,102 +35,110 @@ import java.util.stream.Collectors;
 
 public class TransformSlackNiceties implements ITransformer {
 
-    @Override
-    public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service, Object rawEvent) {
-        if (Arrays.asList(rawEvent.getClass().getInterfaces()).contains(SlackMessageUpdated.class)) {
-            return processUpdateEvent(service, (SlackMessageUpdated) rawEvent);
-        }
-        if (Arrays.asList(rawEvent.getClass().getInterfaces()).contains(SlackMessagePosted.class)) {
-            return processPostEvent(service, (SlackMessagePosted) rawEvent);
-        }
-        return null;
+  @Override
+  public FirehoseMessage transform(FirehoseMessage firehoseMessage, IAdapter service,
+      Object rawEvent) {
+    if(Arrays.asList(rawEvent.getClass().getInterfaces()).contains(SlackMessageUpdated.class)) {
+      return processUpdateEvent(service, (SlackMessageUpdated) rawEvent);
+    }
+    if(Arrays.asList(rawEvent.getClass().getInterfaces()).contains(SlackMessagePosted.class)) {
+      return processPostEvent(service, (SlackMessagePosted) rawEvent);
+    }
+    return null;
+  }
+
+  public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IAdapter service) {
+    return null;
+  }
+
+  @Override
+  public FirehoseMessage transform(final FirehoseMessage firehoseMessage) {
+    return null;
+  }
+
+  private FirehoseMessage processUpdateEvent(IAdapter service, SlackMessageUpdated rawEvent) {
+    SlackMessageUpdated event = rawEvent;
+
+    if(event.getAttachments().size() != 1) {
+      return null;
     }
 
-    public FirehoseMessage transform(final FirehoseMessage firehoseMessage, final IAdapter service) {
-        return null;
+    Optional<FirehoseMessage> opt = Optional.ofNullable(getLinkExpansion(service, rawEvent));
+
+    return opt.orElse(null);
+  }
+
+  private FirehoseMessage processPostEvent(IAdapter service, SlackMessagePosted rawEvent) {
+    SlackMessagePosted event = rawEvent;
+
+    if(event.getAttachments().size() != 1) {
+      return null;
     }
 
-    @Override
-    public FirehoseMessage transform(final FirehoseMessage firehoseMessage) {
-        return null;
+    Optional<FirehoseMessage> opt =
+        Optional.ofNullable(getImageFromIntegrations(service, rawEvent));
+
+    return opt.orElse(getGiphyExpansion(service, rawEvent));
+  }
+
+  private FirehoseMessage getLinkExpansion(IAdapter service, SlackMessageUpdated event) {
+    SlackAttachment attachment = event.getAttachments().get(0);
+    String message = event.getNewMessage();
+
+    if(attachment.getTitleLink() == null) {
+      return null;
     }
 
-
-    private FirehoseMessage processUpdateEvent(IAdapter service, SlackMessageUpdated rawEvent) {
-        SlackMessageUpdated event = rawEvent;
-
-        if (event.getAttachments().size() != 1) return null;
-
-        Optional<FirehoseMessage> opt = Optional.ofNullable(getLinkExpansion(service, rawEvent));
-
-        return opt.orElse(null);
+    if(!MessageFormat.format("<{0}>", attachment.getTitleLink()).equals(message)) {
+      return null;
     }
 
-    private FirehoseMessage processPostEvent(IAdapter service, SlackMessagePosted rawEvent) {
-        SlackMessagePosted event = rawEvent;
+    String words = Arrays.stream(attachment.getText().split(" "))
+        .limit(20)
+        .collect(Collectors.joining(" "));
 
-        if (event.getAttachments().size() != 1) return null;
+    return new FirehoseMessage(
+        "slack",
+        "post",
+        "β",
+        service.getIdentifier(),
+        event.getChannel().getName(),
+        MessageFormat.format("*{0}*: {1}...", attachment.getTitle(), words)
+    );
+  }
 
-        Optional<FirehoseMessage> opt = Optional.ofNullable(getRightGIFExpansion(service, rawEvent));
+  private FirehoseMessage getImageFromIntegrations(IAdapter service, SlackMessagePosted event) {
+    SlackAttachment attachment = event.getAttachments().get(0);
 
-        return opt.orElse(getGiphyExpansion(service, rawEvent));
+    String userName = event.getSender().getUserName();
+
+    if(!userName.equals("RightGIF") && !userName.equals("ZOMG Memes!")) {
+      return null;
     }
 
+    return new FirehoseMessage(
+        "slack",
+        "post",
+        userName,
+        service.getIdentifier(),
+        event.getChannel().getName(),
+        attachment.getImageUrl()
+    );
+  }
 
-    private FirehoseMessage getLinkExpansion(IAdapter service, SlackMessageUpdated event) {
-        SlackAttachment attachment = event.getAttachments().get(0);
-        String message = event.getNewMessage();
-
-        if (attachment.getTitleLink() == null) return null;
-
-        if (!MessageFormat.format("<{0}>", attachment.getTitleLink()).equals(message)) {
-            return null;
-        }
-
-        String words = Arrays.stream(attachment.getText().split(" "))
-                .limit(20)
-                .collect(Collectors.joining(" "));
-
-        return new FirehoseMessage(
-                "slack",
-                "post",
-                "β",
-                service.getIdentifier(),
-                event.getChannel().getName(),
-                MessageFormat.format("*{0}*: {1}...", attachment.getTitle(), words)
-        );
+  private FirehoseMessage getGiphyExpansion(IAdapter service, SlackMessagePosted event) {
+    SlackAttachment attachment = event.getAttachments().get(0);
+    if(!event.getMessageContent().startsWith("/giphy")) {
+      return null;
     }
 
-    private FirehoseMessage getRightGIFExpansion(IAdapter service, SlackMessagePosted event) {
-        SlackAttachment attachment = event.getAttachments().get(0);
-
-        if (!event.getSender().getUserName().equals("RightGIF")) {
-            return null;
-        }
-
-        return new FirehoseMessage(
-                "slack",
-                "post",
-                event.getSender().getUserName(),
-                service.getIdentifier(),
-                event.getChannel().getName(),
-                attachment.getImageUrl()
-        );
-    }
-
-    private FirehoseMessage getGiphyExpansion(IAdapter service, SlackMessagePosted event) {
-        SlackAttachment attachment = event.getAttachments().get(0);
-        if (!event.getMessageContent().startsWith("/giphy")) {
-            return null;
-        }
-
-        return new FirehoseMessage(
-                "slack",
-                "post",
-                "Giphy",
-                service.getIdentifier(),
-                event.getChannel().getName(),
-                attachment.getImageUrl()
-        );
-    }
+    return new FirehoseMessage(
+        "slack",
+        "post",
+        "Giphy",
+        service.getIdentifier(),
+        event.getChannel().getName(),
+        attachment.getImageUrl()
+    );
+  }
 }

@@ -36,12 +36,7 @@ import com.ullink.slack.simpleslackapi.SlackUser;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
-import com.ullink.slack.simpleslackapi.listeners.SlackMessagePostedListener;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessageUpdatedListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -49,8 +44,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class TetradSlack implements SlackMessagePostedListener, IAdapter {
+public class TetradSlack implements IAdapter {
     private final SlackConfig slackConfig;
     private final List<ITransformer> transformers;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
@@ -68,8 +65,15 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
                 slackConfig.botid
         ));
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
-        slackSession.addMessagePostedListener(this);
+        slackSession.addMessagePostedListener(this::onEvent);
         slackSession.addMessageUpdatedListener(this::onUpdateEvent);
+        slackSession.addPinAddedListener((event, session) -> {
+            logger.info("yo");
+        });
+        slackSession.addReactionAddedListener((event, session) -> {
+            logger.info("a");
+        });
+        //slackSession.add
         this.callback = callback;
         try {
             slackSession.connect();
@@ -105,7 +109,6 @@ public class TetradSlack implements SlackMessagePostedListener, IAdapter {
         slackSession.sendMessage(slackChannel, "", attach);
     }
 
-    @Override
     public void onEvent(SlackMessagePosted event, SlackSession session) {
         SlackUser sender = event.getSender();
         FirehoseMessage firehoseMessage = new FirehoseMessage(
