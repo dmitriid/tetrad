@@ -26,7 +26,6 @@ import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.adapters.TetradTelegram;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ import java.util.Map;
 
 public class TelegramService implements IManagedService {
     private final Map<String, TetradTelegram> telegrams = new HashMap<>();
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger                      logger    = LoggerFactory.getLogger(this.getClass().getCanonicalName());
     private TetradMQTT mqtt;
 
     @Override
@@ -60,13 +59,6 @@ public class TelegramService implements IManagedService {
     }
 
     private void postToTelegram(FirehoseMessage firehoseMessage) {
-/*
-        if (!telegrams.containsKey(firehoseMessage.service)) {
-            return;
-        }
-
-        telegrams.get(firehoseMessage.service).post(firehoseMessage);
-*/
         logger.info("Publish to Telegram: " + firehoseMessage.toLogString());
         telegrams.forEach((s, tetradTelegram) -> tetradTelegram.post(firehoseMessage));
     }

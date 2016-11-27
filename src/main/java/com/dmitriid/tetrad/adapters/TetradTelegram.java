@@ -25,15 +25,15 @@ package com.dmitriid.tetrad.adapters;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import java.text.MessageFormat;
 
@@ -43,7 +43,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
     //private final List<String> rooms = new ArrayList<>();
     private ITetradCallback callback;
-    private Long startTimestamp;
+    private Long            startTimestamp;
 
     public TetradTelegram(JsonNode configuration) {
         botid = configuration.at("/botid").asText();
@@ -53,18 +53,18 @@ public class TetradTelegram extends TelegramLongPollingBot {
     public void start(ITetradCallback callback) {
         logger.debug("Run");
         logger.info(MessageFormat.format("Connecting with botid {0}",
-                botid
-        ));
+                                         botid
+                                        ));
         this.startTimestamp = System.currentTimeMillis() / 1000L;
         this.callback = callback;
         TelegramBotsApi bot = new TelegramBotsApi();
         try {
             bot.registerBot(this);
-        } catch (TelegramApiException e) {
+        } catch (TelegramApiRequestException e) {
             logger.error(MessageFormat.format("Error connecting with botid {0}. Message: {1}",
-                    botid,
-                    e.getMessage()
-            ));
+                                              botid,
+                                              e.getMessage()
+                                             ));
         }
     }
 
@@ -76,11 +76,11 @@ public class TetradTelegram extends TelegramLongPollingBot {
 
         Message message = update.getMessage();
         FirehoseMessage firehoseMessage = new FirehoseMessage("telegram",
-                "post",
-                message.getFrom().getUserName(),
-                message.getChat().getId().toString(),
-                message.getChat().getTitle(),
-                message.getText());
+                                                              "post",
+                                                              message.getFrom().getUserName(),
+                                                              message.getChat().getId().toString(),
+                                                              message.getChat().getTitle(),
+                                                              message.getText());
 
         logger.info("Got event from service: " + firehoseMessage.toLogString());
 
@@ -117,9 +117,9 @@ public class TetradTelegram extends TelegramLongPollingBot {
             sendMessage(sendMessageReq);
         } catch (TelegramApiException e) {
             logger.error(MessageFormat.format("Error publishing message. Message: {0} Original message: {1}",
-                    e.getMessage(),
-                    firehoseMessage.toLogString()
-            ));
+                                              e.getMessage(),
+                                              firehoseMessage.toLogString()
+                                             ));
         }
     }
 }
