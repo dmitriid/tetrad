@@ -1,0 +1,22 @@
+# IRC -> Slack
+---
+handler: MappingService
+
+mapping:
+  - from_service: "irc.<host>.net"
+    from_type: irc
+    from_subtype: message
+    from_channel: channel-name-with-no-hash-bang
+    to_service: dmitriid
+    to_channel: random
+    short_username: false
+
+mqtt:
+  clientid: tsm
+  broker: tcp://localhost:1883
+  subscribe:
+    topic: firehose
+    qos: 0
+  firehose:
+    topic: to-slack
+    qos: 0

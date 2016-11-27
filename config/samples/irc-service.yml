@@ -1,0 +1,19 @@
+# IRC Service
+---
+handler: IRCService
+
+irc:
+  - service: irc.<host>.net
+    channel: channel-name-with-no-hash
+    ignore:
+      - some-nick-to-ignore
+
+mqtt:
+  clientid: xmpp-firehose
+  broker: tcp://localhost:1883
+  firehose:
+    topic: firehose
+    qos: 0
+  subscribe:
+    topic: to-irc
+    qos: 0
