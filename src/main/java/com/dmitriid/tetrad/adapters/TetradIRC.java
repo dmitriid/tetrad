@@ -24,7 +24,9 @@ package com.dmitriid.tetrad.adapters;
 
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
+import com.dmitriid.tetrad.utils.MiscUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -51,6 +53,24 @@ public class TetradIRC extends ListenerAdapter {
     private final List<String> ignore = new ArrayList<>();
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+
+    private final String[] colors = {
+            Colors.BLACK,
+            Colors.DARK_BLUE,
+            Colors.DARK_GREEN,
+            Colors.RED,
+            Colors.BROWN,
+            Colors.PURPLE,
+            Colors.OLIVE,
+            Colors.YELLOW,
+            Colors.GREEN,
+            Colors.TEAL,
+            Colors.CYAN,
+            Colors.BLUE,
+            Colors.MAGENTA,
+            Colors.DARK_GRAY,
+            Colors.LIGHT_GRAY
+    };
 
     public TetradIRC(JsonNode config) {
         this.serverName = config.at("/service").asText();
@@ -126,11 +146,14 @@ public class TetradIRC extends ListenerAdapter {
     public void post(FirehoseMessage firehoseMessage) {
         logger.info("Publish message " + firehoseMessage.toLogString());
 
+        int idx = Integer.decode("#" + MiscUtils.toRGB(firehoseMessage.user)) % this.colors.length;
+        String color = this.colors[idx];
+
         this.bot
                 .sendIRC()
                 .message(
                         this.getChannel(),
-                        "*" + firehoseMessage.user + "*: " + firehoseMessage.content
+                        color + "*" + firehoseMessage.user + "*: " + Colors.NORMAL + firehoseMessage.content
                         );
     }
 
