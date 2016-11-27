@@ -11,6 +11,15 @@ The word "тетрадь" ([`tetrádʹ [tʲɪˈtratʲ]`](https://en.wiktionary.o
 means "exercise book, notebook" in Russian, hence the icon (I know it's a
 clipboard, not a notebook, but I like it :) ).
 
+# Chat platforms supported as of version 0.2
+
+- Slack
+- XMPP
+- Telegram
+- IRC
+
+Note: you can have two-way communication between any of these services
+
 # Requirements
 
 - This code
