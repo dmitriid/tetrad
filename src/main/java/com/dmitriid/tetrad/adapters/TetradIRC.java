@@ -95,7 +95,7 @@ public class TetradIRC extends ListenerAdapter {
 
             Configuration configuration =
                     new Configuration.Builder()
-                            .setName("B")
+                            .setName("tetrad")
                             .setLogin("tetrad")
                             .setAutoNickChange(true)
                             .addServer(this.serverName)
