@@ -8,7 +8,7 @@ deployment:
     branch: master
     commands:
       - mvn package
-      - docker build -f ./Dockerfile.run -t dmitriid/tetrad .
+      - docker build --rm=false -f ./Dockerfile.run -t dmitriid/tetrad .
       - docker login -e $DOCKER_REGISTRY_EMAIL -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD registry.dmitriid.com
       - docker tag dmitriid/tetrad registry.dmitriid.com/tetrad
       - docker push registry.dmitriid.com/tetrad
