@@ -33,7 +33,7 @@ RUN apt-get update && \
 RUN wget https://bintray.com/artifact/download/erlio/vernemq/deb/trusty/vernemq_0.12.5p5-1_amd64.deb -O /tmp/vernemq_0.12.5p5-1_amd64.deb && \
     dpkg -i /tmp/vernemq_0.12.5p5-1_amd64.deb
 
-COPY target/tetrad-0.1-jar-with-dependencies.jar /tetrad/java/tetrad.jar
+COPY target/tetrad-0.2-jar-with-dependencies.jar /tetrad/java/tetrad.jar
 COPY bin/docker-init.sh /tetrad/bin/docker-init.sh
 COPY config/tetrad.tmux /tetrad/bin/tetrad.tmux
 COPY config/vernemq.conf /etc/vernemq/vernemq.conf
