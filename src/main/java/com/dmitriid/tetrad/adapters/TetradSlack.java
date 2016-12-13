@@ -27,31 +27,28 @@ import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.interfaces.ITransformer;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.dmitriid.tetrad.transformers.TransformSlackNiceties;
-import com.dmitriid.tetrad.utils.MiscUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.SlackPreparedMessage;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted;
 import com.ullink.slack.simpleslackapi.events.SlackMessageUpdated;
+import com.ullink.slack.simpleslackapi.impl.SlackChatConfiguration;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import com.ullink.slack.simpleslackapi.listeners.SlackMessageUpdatedListener;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+
 public class TetradSlack implements IAdapter {
-    private final SlackConfig slackConfig;
+    private final SlackConfig        slackConfig;
     private final List<ITransformer> transformers;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
-    private SlackSession slackSession;
+    private SlackSession    slackSession;
     private ITetradCallback callback;
 
     public TetradSlack(JsonNode configuration, List<ITransformer> transformers) {
@@ -62,8 +59,8 @@ public class TetradSlack implements IAdapter {
     public void run(ITetradCallback callback) {
         logger.debug("Run");
         logger.info(MessageFormat.format("Connecting with botid {0}",
-                slackConfig.botid
-        ));
+                                         slackConfig.botid
+                                        ));
         slackSession = SlackSessionFactory.createWebSocketSlackSession(slackConfig.botid);
         slackSession.addMessagePostedListener(this::onEvent);
         slackSession.addMessageUpdatedListener(this::onUpdateEvent);
@@ -79,9 +76,9 @@ public class TetradSlack implements IAdapter {
             slackSession.connect();
         } catch (IOException e) {
             logger.error(MessageFormat.format("Error connecting with botid {0}. Message: {1}",
-                    slackConfig.botid,
-                    e.getMessage()
-            ));
+                                              slackConfig.botid,
+                                              e.getMessage()
+                                             ));
         }
     }
 
@@ -96,17 +93,19 @@ public class TetradSlack implements IAdapter {
         if (slackChannel == null) {
             return;
         }
-        
-        SlackAttachment attach = new SlackAttachment(
-            "",
-            MessageFormat.format("*{0}*: {1}", firehoseMessage.user, firehoseMessage.content),
-            MessageFormat.format("*{0}*: {1}", firehoseMessage.user, firehoseMessage.content),
-            ""
-        );
-        //attach.setAuthorName(firehoseMessage.user);
-        attach.setColor("#" + MiscUtils.toRGB(firehoseMessage.user));
-        attach.addMarkdownIn("text");
-        slackSession.sendMessage(slackChannel, "", attach);
+
+        SlackPreparedMessage preparedMessage =
+                new SlackPreparedMessage
+                        .Builder()
+                        .withMessage(firehoseMessage.content)
+                        .build();
+
+        SlackChatConfiguration configuration =
+                SlackChatConfiguration
+                        .getConfiguration()
+                        .withName(firehoseMessage.user);
+
+        slackSession.sendMessage(slackChannel, preparedMessage, configuration);
     }
 
     public void onEvent(SlackMessagePosted event, SlackSession session) {
@@ -132,7 +131,8 @@ public class TetradSlack implements IAdapter {
             firehoseMessage = transfomer.transform(firehoseMessage, this);
         }
 
-        if (!firehoseMessage.content.isEmpty()) callback.execute(firehoseMessage);
+        if (!firehoseMessage.content.isEmpty())
+            callback.execute(firehoseMessage);
 
         FirehoseMessage possibleFollowup = new TransformSlackNiceties().transform(firehoseMessage, this, event);
         Optional.ofNullable(possibleFollowup).ifPresent(msg -> {
@@ -175,8 +175,8 @@ public class TetradSlack implements IAdapter {
     private static class SlackConfig {
         final String botid;
         final String identifier;
-        final Map<String, Boolean> ignore = new HashMap<>();
-        final List<String> channels = new ArrayList<>();
+        final Map<String, Boolean> ignore   = new HashMap<>();
+        final List<String>         channels = new ArrayList<>();
 
         SlackConfig(JsonNode config) {
             botid = config.at("/botid").asText();
