@@ -26,7 +26,6 @@ import com.dmitriid.tetrad.TetradObjectFactory;
 import com.dmitriid.tetrad.adapters.TetradMQTT;
 import com.dmitriid.tetrad.interfaces.IManagedService;
 import com.dmitriid.tetrad.interfaces.ITransformer;
-import com.dmitriid.tetrad.utils.JIDUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
@@ -128,9 +127,9 @@ class TetradMap {
             fm.subtype = toSubtype;
         }
 
-        if (shortUserNames) {
+        /*if (shortUserNames) {
             fm.user = JIDUtils.jid_to_slack_username(fm.user);
-        }
+        }*/
 
         return fm;
     }
