@@ -28,7 +28,6 @@ import com.dmitriid.tetrad.utils.JIDUtils;
 import com.dmitriid.tetrad.utils.MiscUtils;
 import com.dmitriid.tetrad.utils.XMPPUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -47,19 +46,19 @@ import java.util.List;
 import java.util.Map;
 
 public class TetradXMPP {
-    private final String service_domain;
-    private final String username;
-    private final String password;
-    private final String resource;
+    private final String  service_domain;
+    private final String  username;
+    private final String  password;
+    private final String  resource;
     private final Integer max_resources;
-    private final List<String> ignore = new ArrayList<>();
-    private final List<String> rooms = new ArrayList<>();
-    private final Map<String, MultiUserChat> connectedRooms = new HashMap<>();
+    private final List<String>               ignore             = new ArrayList<>();
+    private final List<String>               rooms              = new ArrayList<>();
+    private final Map<String, MultiUserChat> connectedRooms     = new HashMap<>();
     private final HashMap<String/*user*/, MultiUserChat>
-            perUserRooms = new HashMap<>();
+                                             perUserRooms       = new HashMap<>();
     private final HashMap<String/*user*/, XMPPConnection>
-            perUserConnections = new HashMap<>();
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+                                             perUserConnections = new HashMap<>();
+    private final Logger                     logger             = LoggerFactory.getLogger(this.getClass().getCanonicalName());
     private String chat_service;
     private Boolean resource_per_user = false;
     private ITetradCallback callback;
@@ -85,10 +84,10 @@ public class TetradXMPP {
     public void start(ITetradCallback callback) {
         logger.debug("start");
         logger.info(MessageFormat.format("Connecting to service {0} with username {1} and resource {2}",
-                service_domain,
-                username,
-                resource
-        ));
+                                         service_domain,
+                                         username,
+                                         resource
+                                        ));
         this.callback = callback;
         try {
             XMPPConnection xmppConnection = new XMPPConnection(service_domain);
@@ -110,22 +109,22 @@ public class TetradXMPP {
             }
         } catch (XMPPException e) {
             logger.error(MessageFormat.format("Error connecting to service {0} with username {1} and resource {2}. Message: {3}",
-                    service_domain,
-                    username,
-                    resource,
-                    e.getMessage()
-            ));
+                                              service_domain,
+                                              username,
+                                              resource,
+                                              e.getMessage()
+                                             ));
         }
     }
 
     private void handleMessage(Message message, String room) {
         String jid = message.getFrom().replace(room + "/", "");
         FirehoseMessage firehoseMessage = new FirehoseMessage("xmpp",
-                message.getType().name(),
-                JIDUtils.bareJID(jid) + "@" + getChatService(),
-                getChatService(),
-                room,
-                message.getBody());
+                                                              message.getType().name(),
+                                                              JIDUtils.bareJID(jid),
+                                                              getChatService(),
+                                                              room,
+                                                              message.getBody());
 
         logger.info("Got message from service: " + firehoseMessage.toLogString());
 
@@ -158,8 +157,8 @@ public class TetradXMPP {
                             "Ignore because message service {0} does not match service {1}",
                             firehoseMessage.service,
                             chat_service
-                    )
-            );
+                                        )
+                       );
             return;
         }
 
@@ -168,8 +167,8 @@ public class TetradXMPP {
                     MessageFormat.format(
                             "Ignore because message channel {0} does not match connected channels",
                             firehoseMessage.channel
-                    )
-            );
+                                        )
+                       );
             return;
         }
         MultiUserChat chat = connectedRooms.get(firehoseMessage.channel);
@@ -179,18 +178,18 @@ public class TetradXMPP {
                             "Chat {0}@{1} is not joined",
                             firehoseMessage.service,
                             firehoseMessage.channel
-                    )
-            );
+                                        )
+                       );
             try {
                 chat.join(chat.getNickname());
             } catch (XMPPException e) {
                 logger.error(
                         MessageFormat.format("Error connecting to chatroom {0} at service {1} with username {2}. Message: {3}",
-                                chat.getRoom(),
-                                service_domain,
-                                username,
-                                e.getMessage()
-                        ));
+                                             chat.getRoom(),
+                                             service_domain,
+                                             username,
+                                             e.getMessage()
+                                            ));
                 return;
             }
         }
@@ -222,18 +221,18 @@ public class TetradXMPP {
             chat.sendMessage(msg);
         } catch (XMPPException e) {
             logger.error(MessageFormat.format("Error publishing XHTML-enabled message to chatroom {0}. Message: {1}. Original message: {2}",
-                    chat.getRoom(),
-                    e.getMessage(),
-                    firehoseMessage.toLogString()
-            ));
+                                              chat.getRoom(),
+                                              e.getMessage(),
+                                              firehoseMessage.toLogString()
+                                             ));
             try {
                 logger.info(
                         MessageFormat.format(
                                 "Attempting to send plain XMPP message to chatroom {0}: {1}",
                                 chat.getRoom(),
                                 firehoseMessage.toLogString()
-                        )
-                );
+                                            )
+                           );
                 chat.sendMessage(firehoseMessage.user + ": " + firehoseMessage.content);
             } catch (XMPPException e1) {
                 logger.error(
@@ -242,8 +241,8 @@ public class TetradXMPP {
                                 chat.getRoom(),
                                 e1.getMessage(),
                                 firehoseMessage.toLogString()
-                        )
-                );
+                                            )
+                            );
             }
         }
     }
@@ -264,8 +263,8 @@ public class TetradXMPP {
                                     service_domain,
                                     username,
                                     resource
-                            )
-                    );
+                                                )
+                               );
                     perUserConn.connect();
                     perUserConn.login(username, password, JIDUtils.bareUsername(firehoseMessage.user));
                     perUserConnections.put(firehoseMessage.user, perUserConn);
@@ -277,7 +276,7 @@ public class TetradXMPP {
                     firehoseMessage.channel,
                     firehoseMessage.service,
                     firehoseMessage.user
-            );
+                                                   );
             if (perUserRooms.containsKey(localUser)) {
                 perUserChatRoom = perUserRooms.get(localUser);
             } else {
@@ -291,8 +290,8 @@ public class TetradXMPP {
                                 "Joining room {0} as {1}",
                                 roomJID,
                                 perUserConn.getUser()
-                        )
-                );
+                                            )
+                           );
 
                 perUserChatRoom = new MultiUserChat(perUserConn, roomJID);
                 perUserChatRoom.join(perUserConn.getUser());//, password);
@@ -307,8 +306,8 @@ public class TetradXMPP {
                             "Error publishing as user to chatroom. Message: {0}. Original message: {1}",
                             e.getMessage(),
                             firehoseMessage.toLogString()
-                    )
-            );
+                                        )
+                        );
         }
     }
 }
