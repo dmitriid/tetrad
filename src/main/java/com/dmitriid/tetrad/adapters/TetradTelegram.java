@@ -117,7 +117,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
         sendMessageReq.enableMarkdown(true);
         sendMessageReq.setText("*" + firehoseMessage.user + "*: " + firehoseMessage.content);
         try {
-            sendMessage(sendMessageReq);
+            execute(sendMessageReq);
         } catch (TelegramApiException e) {
             logger.error(MessageFormat.format("Error publishing message. Message: {0} Original message: {1}",
                                               e.getMessage(),
