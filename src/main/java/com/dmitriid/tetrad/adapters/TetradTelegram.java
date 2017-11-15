@@ -70,6 +70,8 @@ public class TetradTelegram extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        logger.info("Received update: " + update.toString());
+        logger.info("Has message: " + update.hasMessage());
         if (!update.hasMessage()) {
             return;
         }
@@ -83,6 +85,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
                                                               message.getText());
 
         logger.info("Got event from service: " + firehoseMessage.toLogString());
+        logger.info("Timestamp: " + message.getDate() + " vs local " + startTimestamp);
 
         if (message.getDate() < startTimestamp) {
             return;
