@@ -7,7 +7,7 @@ neww -n "slack-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/conf
 #neww -n "irc-service" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/irc-service.yml
 #neww -n "irc-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/irc-to-slack.yml
 #neww -n "slack-to-irc" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/slack-to-irc.yml
-neww -n "slack-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/slack-to-telegram.yml
-neww -n "slack-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/telegram-to-slack.yml
-neww -n "slack-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/xmpp-to-telegram.yml
-neww -n "slack-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/telegram-to-xmpp.yml
+neww -n "slack-to-telegram" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/slack-to-telegram.yml
+neww -n "telegram-to-slack" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/telegram-to-slack.yml
+neww -n "xmpp-to-telegram" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/xmpp-to-telegram.yml
+neww -n "telegram-to-xmpp" java -jar /tetrad/java/tetrad.jar --config /tetrad/config/telegram-to-xmpp.yml
