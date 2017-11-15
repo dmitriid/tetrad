@@ -8,7 +8,7 @@ VOLUME /var/log/tetrad
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y  apt-get install -y locales
+    apt-get install -y locales
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
