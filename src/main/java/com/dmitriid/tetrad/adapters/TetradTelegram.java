@@ -27,6 +27,7 @@ import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
@@ -45,9 +46,12 @@ public class TetradTelegram extends TelegramLongPollingBot {
     private ITetradCallback callback;
     private Long            startTimestamp;
 
+    final TelegramBotsApi bot;
+
     public TetradTelegram(JsonNode configuration) {
         botid = configuration.at("/botid").asText();
         username = configuration.at("/username").asText();
+        bot = new TelegramBotsApi();
     }
 
     public void start(ITetradCallback callback) {
@@ -57,7 +61,7 @@ public class TetradTelegram extends TelegramLongPollingBot {
                                         ));
         this.startTimestamp = System.currentTimeMillis() / 1000L;
         this.callback = callback;
-        TelegramBotsApi bot = new TelegramBotsApi();
+
         try {
             bot.registerBot(this);
         } catch (TelegramApiRequestException e) {
@@ -100,11 +104,13 @@ public class TetradTelegram extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
+        logger.info("Username requested: " + username);
         return username;
     }
 
     @Override
     public String getBotToken() {
+        logger.info("Token requested: " + botid);
         return botid;
     }
 

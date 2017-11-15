@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.telegram.telegrambots.ApiContextInitializer;
 
 public class TelegramService implements IManagedService {
     private final Map<String, TetradTelegram> telegrams = new HashMap<>();
@@ -40,6 +41,7 @@ public class TelegramService implements IManagedService {
     @Override
     public void init(ServiceConfiguration configuration) {
         logger.debug("Init");
+        ApiContextInitializer.init();
         for (JsonNode config : configuration.getConfiguration().at("/telegram")) {
             telegrams.put(config.at("/identifier").asText(), new TetradTelegram(config));
         }
