@@ -25,6 +25,7 @@ package com.dmitriid.tetrad.adapters;
 import com.dmitriid.tetrad.interfaces.ITetradCallback;
 import com.dmitriid.tetrad.services.FirehoseMessage;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -81,12 +82,21 @@ public class TetradTelegram extends TelegramLongPollingBot {
         }
 
         Message message = update.getMessage();
+
+        String username = Optional.ofNullable(message.getFrom().getUserName())
+            .orElse(
+                MessageFormat.format(
+                    "{0} {1}",
+                    message.getFrom().getFirstName(),
+                    message.getFrom().getLastName())
+            );
+
         FirehoseMessage firehoseMessage = new FirehoseMessage("telegram",
-                                                              "post",
-                                                              message.getFrom().getUserName(),
-                                                              message.getChat().getId().toString(),
-                                                              message.getChat().getTitle(),
-                                                              message.getText());
+                                                             "post",
+                                                             username,
+                                                             message.getChat().getId().toString(),
+                                                             message.getChat().getTitle(),
+                                                             message.getText());
 
         logger.info("Got event from service: " + firehoseMessage.toLogString());
         logger.info("Timestamp: " + message.getDate() + " vs local " + startTimestamp);
